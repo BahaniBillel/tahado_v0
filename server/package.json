@@ -1,0 +1,33 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": " nodemon server.js",
+    "apollo": " nodemon ./graphql/apollo.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^4.9.5",
+    "aws-sdk": "^2.1484.0",
+    "axios": "^1.6.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-graphql": "^0.12.0",
+    "graphql": "^16.8.1",
+    "graphql-tools": "^9.0.0",
+    "lodash": "^4.17.21",
+    "next-auth": "^4.23.2",
+    "nodemon": "^3.0.1",
+    "pg": "^8.11.2"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.6.0",
+    "prisma": "^5.6.0"
+  }
+}

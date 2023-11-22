@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  /* color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb)); */
+}
+
+@layer components {
+  /* .link {
+    @apply cursor-pointer hover:underline;
+  } */
+  .midLink {
+    @apply flex flex-row whitespace-pre  items-center space-x-1;
+  }
+
+  .navOption {
+    @apply flex flex-col   items-center space-y-5 justify-center text-center;
+  }
+  .button {
+    @apply whitespace-pre w-min shadow-md text-charcoal  bg-turquoise text-center  px-2 py-1 rounded-sm hover:scale-95 transition-all ease-in-out duration-200 cursor-pointer;
+  }
+  .listDot {
+    @apply flex flex-row   justify-end items-start;
+  }
+  .input {
+    @apply border border-charcoal/30 w-full rounded-sm py-1 outline-none focus:bg-lightGray text-right pr-1 text-sm font-light;
+  }
+
+  .smalltitle {
+    @apply text-xl text-charcoal  py-1 font-semibold text-right;
+  }
+
+  .para {
+    @apply text-base  text-right;
+  }
+}
+
+/* KEEN SLIDER */
+
+[class^="number-slide"],
+[class*=" number-slide"] {
+  background: grey;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  color: #fff;
+  font-weight: 500;
+  height: 300px;
+  max-height: 100vh;
+}
+
+.navigation-wrapper {
+  position: relative;
+}
+
+.arrow {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  fill: #ffffff;
+  cursor: pointer;
+  background-color: rgb(0, 0, 0);
+  padding: 10px;
+  border-radius: 100%;
+  opacity: 80%;
+}
+
+.arrow--left {
+  left: 5px;
+}
+
+.arrow--right {
+  left: auto;
+  right: 5px;
+}
+
+.arrow--disabled {
+  fill: rgba(152, 152, 152, 0.245);
+}
+
+.thumbnail .keen-slider__slide {
+  font-size: 30px;
+  margin-top: 10px;
+  height: 100px;
+}
+.thumbnail .keen-slider__slide {
+  cursor: pointer;
+}
+.thumbnail .keen-slider__slide.active {
+  border: 2px solid #fdbfa6;
+}
+
+/* END KEEN SLIDER */
+
+.right-aligned-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row-reverse; /* Reverse the list order */
+
+  li {
+    margin: 0;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    margin-left: 1rem; /* Add margin to create separation between list items */
+  }
+}
