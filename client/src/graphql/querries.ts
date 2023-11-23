@@ -1,4 +1,23 @@
 import { gql } from "@apollo/client";
+import {GraphQLClient} from "graphql-request"
+
+const client = new GraphQLClient("http://localhost:3001/graphql")
+
+
+
+
+
+export async function getUsers(){
+  const query = gql`
+  
+  query Users {
+  users {
+    first_name
+  }
+}`
+const {users}= await client.request(query)
+return users
+}
 
 export const GET_CATEGORIES = gql`
   query Categories {

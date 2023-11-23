@@ -37,13 +37,39 @@ exports.createUser = async (req, res) => {
     // Replace the plaintext password with the hashed password
     userData.password_hash = hashedPassword;
 
+    // Create the user
     const user = await prisma.users.create({
       data: userData,
     });
+
+    // // Set users with user_id from 1 to 3 as admins by default
+    // if (user.user_id >= 1 && user.user_id <= 3) {
+    //   await prisma.users.update({
+    //     where: { user_id: user.user_id },
+    //     data: { roles: ["admin"] },
+    //   });
+    // }
+
+    // Set the first user as admin, and the second and third as moderators
+    if (user.user_id === 1) {
+      await prisma.users.update({
+        where: { user_id: user.user_id },
+        data: { roles: ["admin"] },
+      });
+    } else if (user.user_id >= 2 && user.user_id <= 5) {
+      await prisma.users.update({
+        where: { user_id: user.user_id },
+        data: { roles: ["moderator"] },
+      });
+    }
+
     res.status(201).json({ message: "User created", user });
   } catch (error) {
     console.error("Prisma Error:", error);
     res.status(500).json({ error: "Failed to create user", details: error });
+  } finally {
+    // Close the Prisma client
+    await prisma.$disconnect();
   }
 };
 

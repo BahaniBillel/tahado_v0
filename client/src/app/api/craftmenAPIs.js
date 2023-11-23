@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const CreateCraftmanAPI = async (craftmanData) => {
+  console.log(craftmanData);
   try {
     const response = await axios.post(
       "http://localhost:3001/api/v1/craftmen/createCraftman",

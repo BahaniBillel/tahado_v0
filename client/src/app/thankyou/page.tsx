@@ -10,7 +10,7 @@ export default function ThankYou() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/");
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [router]);
@@ -28,7 +28,7 @@ export default function ThankYou() {
           Your account has been successfully created.
         </p>
         <p className="text-sm text-gray-500">
-          Redirecting to home in 5 seconds...
+          Redirecting to home in 2 seconds...
         </p>
       </div>
     </div>

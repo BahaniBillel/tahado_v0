@@ -64,6 +64,7 @@ const typeDefs = `#graphql
     last_name: String
     address: String
     phone_number: String
+    roles: [String!]!  # Add this line for the roles field
     orders: [Order!]!
     paymentmethods: [PaymentMethod!]!
     productreviews: [ProductReview!]!
@@ -104,6 +105,14 @@ const typeDefs = `#graphql
     name: String!
     products: [Product!]!
   }
+  type Mutation {
+  createCraftman(craftmanData: CraftmanInput!): Craftman!
+}
+
+input CraftmanInput {
+  name: String!
+  # Add other fields as needed
+}
 
   type OrderItem {
     item_id: ID!
@@ -141,6 +150,8 @@ const typeDefs = `#graphql
     product: Product!
     occasion: Occasion!
   }
+
+  
 `;
 
 module.exports = typeDefs;

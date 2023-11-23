@@ -1,4 +1,5 @@
-const prisma = require("../prisma/prisma");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const resolvers = {
   Query: {
@@ -10,12 +11,10 @@ const resolvers = {
     users: () => prisma.users.findMany(),
 
     user: async (_, { user_id }) => {
-      // Convert the provided user_id to an integer if needed
-      const userIdAsInt = parseInt(user_id, 10);
       try {
         const user = await prisma.users.findUnique({
           where: {
-            user_id: userIdAsInt,
+            user_id: parseInt(user_id),
           },
         });
 
@@ -41,7 +40,7 @@ const resolvers = {
           productId: productId,
         },
         include: {
-          occasions: true, // Assuming you want to include the related occasion data
+          occasions: true,
         },
       });
     },
@@ -52,6 +51,32 @@ const resolvers = {
           user_id: userId,
         },
       });
+    },
+  },
+
+  Mutation: {
+    createCraftman: async (_, { craftmanData }) => {
+      try {
+        // Check if the craftman already exists based on the name
+        const existingCraftman = await prisma.craftmen.findFirst({
+          where: { name: craftmanData.name },
+        });
+
+        // If the craftman already exists, return an error message
+        if (existingCraftman) {
+          throw new Error("Craftman already exists");
+        }
+
+        // If the craftman does not exist, create a new craftman
+        const craftman = await prisma.craftmen.create({
+          data: craftmanData,
+        });
+
+        return craftman;
+      } catch (error) {
+        console.error("Error creating craftman:", error);
+        throw new Error("Failed to create craftman");
+      }
     },
   },
   Order: {
@@ -85,6 +110,10 @@ const resolvers = {
       prisma.shippingaddresses.findMany({ where: { user_id: parent.user_id } }),
     wishlist: (parent) =>
       prisma.wishlist.findMany({ where: { user_id: parent.user_id } }),
+  },
+  Wishlist: {
+    user: (parent) =>
+      prisma.users.findUnique({ where: { user_id: parent.user_id } }),
   },
   Wishlist: {
     user: (parent) =>

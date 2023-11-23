@@ -4,13 +4,12 @@ const bcrypt = require("bcrypt");
 // CREATE NEW CRAFTMAN
 
 exports.createCraftman = async (req, res) => {
-  console.log(req.body);
-  const craftmanData = req.body;
-
+  const craftmanData = req.body; // Assuming craftman data is directly in the request body
+  console.log("cfraydata", craftmanData);
   try {
     // Check if the craftman already exists based on the name
     const existingCraftman = await prisma.craftmen.findFirst({
-      where: { name: craftmanData.name },
+      where: { name: craftmanData },
     });
 
     // If the craftman already exists, return an error message
@@ -26,7 +25,7 @@ exports.createCraftman = async (req, res) => {
     // Send a success response
     res
       .status(201)
-      .json({ message: "Craftman added to database", craftman: craft_man });
+      .json({ message: "Craftman added to the database", craftman: craft_man });
   } catch (error) {
     console.error("Prisma Error:", error);
     res
