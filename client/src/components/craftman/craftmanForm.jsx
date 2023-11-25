@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // import { CreateCraftmanAPI } from "../../app/api/craftmenAPIs"; // Update with the correct path
 import { CREATE_CRAFTSMAN } from "../../graphql/mutations";
 import { useMutation, gql } from "@apollo/client";
+import { GraphQLClient } from "graphql-request"; // Import GraphQLClient
 
 import { toast } from "sonner";
 // Your Zod validation schema
@@ -18,28 +19,35 @@ const CraftmanForm = () => {
     resolver: zodResolver(craftmanSchema),
   });
   const { errors } = formState;
-  const [createCraftman] = useMutation(CREATE_CRAFTSMAN);
+
+  const createCraftman = async (craftmanData) => {
+    const client = new GraphQLClient("http://localhost:3001/graphql"); // Update with your GraphQL endpoint
+
+    const query = `
+      mutation CreateCraftman($craftmanData: CraftmanInput!) {
+        createCraftman(craftmanData: $craftmanData) {
+          name
+        }
+      }
+    `;
+
+    try {
+      const data = await client.request(query, { craftmanData });
+      console.log("Craftsman created successfully:", data.createCraftman);
+      toast.success("Craftsman created successfully");
+    } catch (error) {
+      console.error("Error creating craftsman:", error);
+      toast.error("Something went wrong while creating the craftsman");
+    }
+  };
 
   const onSubmit = async (data) => {
     console.log("data about to submit", data);
     try {
-      const { data: responseData, errors } = await createCraftman({
-        variables: { craftmanData: data },
-      });
-
-      if (errors) {
-        console.error(errors);
-        toast.error(`GraphQL Error: ${errors[0].message}`);
-      } else if (responseData && responseData.createCraftman) {
-        console.log(responseData.createCraftman);
-        toast.success("Craftsman created successfully");
-        reset();
-      } else {
-        toast.error("Unexpected response from server");
-      }
+      await createCraftman(data);
+      reset();
     } catch (error) {
       console.error(error);
-      toast.error("Something went wrong while creating the craftsman");
     }
   };
 

@@ -107,12 +107,59 @@ const typeDefs = `#graphql
   }
   type Mutation {
   createCraftman(craftmanData: CraftmanInput!): Craftman!
+  createOccasion(occasionData: OccasionInput!): Occasion!
+  createCategory(categoryData: CategoryInput!): Category!
+  createGift(giftData: GiftInput!): Product!
+  createWishItem(wishData:WishInput!):WishlistProductResponse!
+  removeFromWishList(wishlistRemoveData: WishlistRemoveInput!): WishlistItem!
 }
+
+input WishlistRemoveInput {
+  wishlist_id: Int!
+  
+}
+
+
+
+type WishlistProductResponse {
+  wishlist: Wishlist
+  product: Product
+}
+
+input WishInput{
+  user_id:Int!
+  product_id:Int!
+}
+
+input GiftInput {
+  craftman_id: Int
+    sku: String!
+    giftname: String!
+    description: String
+    price: Float!
+    url: String
+    category_id: Int!  
+    occasionIds: [Int!]
+}
+
+input CategoryInput{
+   category_name:String!
+   parent_category_id:Int!
+}
+
+ input CategoryInput {
+    category_name: String!
+    # Add other fields as needed
+  }
 
 input CraftmanInput {
   name: String!
   # Add other fields as needed
 }
+ input OccasionInput {
+    name: String!
+    # Add other fields as needed
+  }
 
   type OrderItem {
     item_id: ID!
@@ -150,6 +197,8 @@ input CraftmanInput {
     product: Product!
     occasion: Occasion!
   }
+
+  
 
   
 `;

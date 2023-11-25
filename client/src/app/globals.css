@@ -114,20 +114,3 @@ body {
 .thumbnail .keen-slider__slide.active {
   border: 2px solid #fdbfa6;
 }
-
-/* END KEEN SLIDER */
-
-.right-aligned-bullets {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: row-reverse; /* Reverse the list order */
-
-  li {
-    margin: 0;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    margin-left: 1rem; /* Add margin to create separation between list items */
-  }
-}

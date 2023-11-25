@@ -9,10 +9,11 @@ import { useDispatch } from "react-redux";
 
 import { incrementLikes, decrementLikes } from "../../../slices/basketSlice";
 
-import { PostWishlist, RemoveWishlist } from "../../app/api/wishlistAPIs";
+// import { PostWishlist, RemoveWishlist } from "../../app/api/wishlistAPIs";
 
 import { GET_WISHLIST } from "../../graphql/querries";
 import { useMutation, useQuery } from "@apollo/client";
+import { GraphQLClient, gql } from "graphql-request";
 
 function ProductLy01({
   mainImage,
@@ -36,6 +37,8 @@ function ProductLy01({
   const { data: wishlistData, refetch: refetchWishlist } =
     useQuery(GET_WISHLIST);
 
+  console.log("logging from productlayout01", wishlistData);
+
   useEffect(() => {
     // Check if the product is liked in localStorage when the component mounts
     const likedProducts =
@@ -54,49 +57,84 @@ function ProductLy01({
   };
 
   const ToggleLikes = async () => {
-    setHeart(!heart);
     const userId = parseInt(user_id, 10);
     const productId = parseInt(product_id, 10);
 
-    // Update localStorage to persist the liked state
-    const likedProducts =
-      JSON.parse(localStorage.getItem("likedProducts")) || {};
-    likedProducts[`${userId}_${productId}`] = !heart;
-    localStorage.setItem("likedProducts", JSON.stringify(likedProducts));
+    // Initialize GraphQLClient
+    const client = new GraphQLClient("http://localhost:3001/graphql");
 
-    if (!userId) {
-      return;
-    }
-
-    const userWishlist = wishlistData?.wishlist.find(
-      (item) => item.user_id === userId
-    );
-
-    if (!heart) {
-      const likeResponse = await PostWishlist(userId, productId);
-      // Refetch the wishlist query to get updated data
-      refetchWishlist();
-
-      if (likeResponse) {
-        dispatch(incrementLikes(product));
-      }
-    } else {
-      // Check if there's a user wishlist
-      if (userWishlist) {
-        const wishlistId = parseInt(userWishlist.wishlist_id);
-        console.log("is there a wish list id heree", wishlistId);
-        const unlikeResponse = await RemoveWishlist(
-          wishlistId,
-          productId,
-          userId
-        );
-        // Refetch the wishlist query to get updated data
-        refetchWishlist();
-
-        if (unlikeResponse) {
-          dispatch(decrementLikes({ giftName }));
+    // Define the GraphQL mutation
+    const mutation = gql`
+      mutation CreateWishItem($wishData: WishInput!) {
+        createWishItem(wishData: $wishData) {
+          wishlist {
+            wishlist_id
+          }
+          product {
+            gift_id
+          }
         }
       }
+    `;
+
+    // Construct the wishData object
+    const wishData = {
+      user_id: userId,
+      product_id: productId,
+    };
+
+    const removeWishlistMutation = gql`
+      mutation RemoveFromWishList($wishlistRemoveData: WishlistRemoveInput!) {
+        removeFromWishList(wishlistRemoveData: $wishlistRemoveData) {
+          wishlist_id
+        }
+      }
+    `;
+
+    // Define input type for the mutation
+    const wishlistRemoveData = {
+      wishlist_id: parseInt(wishlistData.wishlist_id, 10),
+    };
+
+    try {
+      // Toggle the heart state
+      setHeart(!heart);
+
+      // Update localStorage to persist the liked state
+      const likedProducts =
+        JSON.parse(localStorage.getItem("likedProducts")) || {};
+      likedProducts[`${userId}_${productId}`] = !heart;
+      localStorage.setItem("likedProducts", JSON.stringify(likedProducts));
+
+      // If the product is not currently liked, add it to the wishlist
+      if (!heart) {
+        const response = await client.request(mutation, { wishData });
+
+        dispatch(incrementLikes(product));
+      } else {
+        // Remove from wishlist logic
+        const wishlistId = parseInt(wishlistData.wishlist_id, 10);
+        if (wishlistId == null) {
+          console.error("Wishlist ID is null");
+          return; // Exit the function if wishlistId is null
+        }
+        // TODO: wishlistI is printed NaN in console solve the issue today
+        console.log("Removing from wishlist with ID:", wishlistId);
+        // If the product is currently liked, remove it from the wishlist
+        const response = await client.request(removeWishlistMutation, {
+          wishlistRemoveData,
+        });
+
+        console.log("Removed from wishlist:", response);
+
+        dispatch(decrementLikes({ giftName }));
+      }
+
+      // Refetch the wishlist query to get updated data
+      refetchWishlist();
+    } catch (error) {
+      console.error("Error in ToggleLikes:", error);
+      // Handle error
     }
   };
 

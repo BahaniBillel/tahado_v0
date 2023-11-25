@@ -25,11 +25,6 @@ async function GiftDetail({ params }) {
     return <div>Product not found </div>;
   }
 
-  console.log(gifts);
-  const addItemToBasket = async () => {
-    "use server";
-  };
-
   return (
     <div className="w-full flex flex-col md:flex-col  md:px-28 pt-0 md:pt-10 space-y-10 md:space-y-10 pb-24">
       <DynamicPageSkelton

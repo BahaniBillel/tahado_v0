@@ -3,13 +3,11 @@ import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AddGift } from "../../app/api/giftsAPIs";
-import { addCategoryAPI } from "../../app/api/categoriesAPIs";
-import { addOccasionAPI } from "../../app/api/occasionAPIs";
-import { toast } from "react-toastify";
-import { FetchAllOcassions } from "../../app/api/occasionAPIs";
-import { FetchAllCategories } from "../../app/api/categoriesAPIs";
 
+import { toast } from "react-toastify";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_CATEGORIES, GET_OCCASIONS } from "../../graphql/querries"; // Import your queries
+import { GraphQLClient } from "graphql-request";
 const productSchema = z.object({
   giftname: z.string().max(100),
   craftman_id: z.number().optional(),
@@ -17,78 +15,25 @@ const productSchema = z.object({
   price: z.number(),
   category: z.string().max(50),
   url: z.string(),
-  occasion: z.union([z.string(), z.array(z.string())]), // Changed to an array of strings
-  sku: z.string().max(100), // SKU field added
+  occasion: z.union([z.string(), z.array(z.string())]),
+  sku: z.string().max(100),
 });
 
 const AddNewGiftForm = () => {
-  // Logic for Fetching and Handling data from database
-  const [occasions, setOccasions] = React.useState([]);
-  const [selectedOccasions, setSelectedOccasions] = React.useState([]);
+  const {
+    data: categoryData,
+    loading: categoryLoading,
+    error: categoryError,
+  } = useQuery(GET_CATEGORIES);
+  const {
+    data: occasionData,
+    loading: occasionLoading,
+    error: occasionError,
+  } = useQuery(GET_OCCASIONS);
 
-  // Fetch occasions from the API when the component mounts
-  React.useEffect(() => {
-    const fetchOccasions = async () => {
-      try {
-        const fetchedOccasions = await FetchAllOcassions();
-        // Make sure that fetchedOccasions is an array before setting it
-        if (Array.isArray(fetchedOccasions)) {
-          setOccasions(fetchedOccasions);
-        } else {
-          throw new Error("Fetched occasions is not an array");
-        }
-      } catch (error) {
-        console.error("Error fetching occasions:", error);
-        toast.error("Failed to fetch occasions.");
-      }
-    };
-
-    fetchOccasions();
-  }, []);
-
-  // Checkbox change handler
-  const handleOccasionChange = (event) => {
-    if (event.target.checked) {
-      setSelectedOccasions([...selectedOccasions, event.target.value]);
-    } else {
-      setSelectedOccasions(
-        selectedOccasions.filter((o) => o !== event.target.value)
-      );
-    }
-  };
-
-  // ..........................................................................................................
-  // Fetching Categories data from database using api
-  const [categories, setCategories] = React.useState([]);
-  // Logic for selecting Categories and Occasions as IDs
-  const [selectedCategories, setSelectedCategories] = React.useState([]);
-  console.log(categories);
-
-  React.useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const fetchedCategories = await FetchAllCategories();
-
-        if (Array.isArray(fetchedCategories)) {
-          setCategories(fetchedCategories);
-        } else {
-          throw new Error("Fetched categories is not an array");
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast.error("Failed to fetch categories.");
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  React.useEffect(() => {
-    console.log(selectedCategories); // This will log the updated state after changes
-  }, [selectedCategories]);
-
+  const categories = categoryData?.categories || [];
+  const occasions = occasionData?.occasions || [];
   // Logic for Handling Form inputs
-
   const {
     register,
     handleSubmit,
@@ -98,42 +43,95 @@ const AddNewGiftForm = () => {
   } = useForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      occasion: [], // Provide default values for occasions
+      occasion: [],
     },
     shouldUseNativeValidation: true,
   });
+  // Checkbox change handler
+  // Logic for Fetching and Handling data from database
+  // const [occasions, setOccasions] = React.useState([]);
+  const [selectedOccasions, setSelectedOccasions] = React.useState([]);
+  const handleOccasionChange = (event) => {
+    if (event.target.checked) {
+      setSelectedOccasions([...selectedOccasions, event.target.value]);
+    } else {
+      setSelectedOccasions(
+        selectedOccasions.filter((o) => o !== event.target.value)
+      );
+    }
+  };
+  const createGift = async (giftData) => {
+    const client = new GraphQLClient("http://localhost:3001/graphql");
+
+    const mutation = `mutation CreateGift($giftData: GiftInput!) {
+  createGift(giftData: $giftData) {
+    craftman_id
+    sku
+    giftname
+    description
+    price
+    url
+    occasions {
+      occasion {
+        id
+      }
+    }
+    productCategory {
+      category {
+        category_id
+      }
+    }
+  }
+}`;
+
+    try {
+      // Convert categoryId to integer before sending
+      const categoryIdInt = parseInt(giftData.category_id, 10);
+
+      // Modify the giftData to use the converted categoryId
+      const modifiedGiftData = {
+        ...giftData,
+        category_id: categoryIdInt,
+      };
+
+      const data = await client.request(mutation, {
+        giftData: modifiedGiftData,
+      });
+      console.log("Gift created successfully:", data.createGift);
+      toast.success("Gift created successfully");
+    } catch (error) {
+      console.error("Error creating gift:", error);
+      toast.error("Something went wrong while creating the gift");
+    }
+  };
 
   const onSubmit = async (data) => {
-    // Find the category ID based on the selected category name
+    console.log("the data  about to be  addeed for  new gift", data);
     const selectedCategory = categories.find(
       (c) => c.category_name === data.category
     );
-    const categoryId = selectedCategory ? selectedCategory.category_id : null;
-    // console.log(selectedCategory.category_id);
+    const category_id = selectedCategory
+      ? parseInt(selectedCategory.category_id)
+      : null;
 
-    // Map the selected occasion names to their IDs
     const occasionIds = occasions
       .filter((occasion) => data.occasion.includes(occasion.name))
-      .map((occasion) => occasion.id);
-    console.log(occasionIds);
+      .map((occasion) => parseInt(occasion.id));
 
-    // Prepare the data for the API
     const apiData = {
       ...data,
-      categoryId, // Include the category ID
-      occasionIds, // Include the occasion IDs
+      category_id: category_id,
+      occasionIds,
     };
 
-    // Remove the occasion names array from apiData since we now have occasionIds
+    console.log("before deleting cat", apiData);
+
     delete apiData.occasion;
     delete apiData.category;
-
-    console.log("data to be sent", apiData.categoryId);
+    console.log("after deleting cat", apiData);
     try {
-      // const response = await AddGift(submitData);* // Assuming that category and occasion selections have been collected as IDs
-      const response = await AddGift(apiData);
+      await createGift(apiData);
       await notify(apiData.giftname);
-      console.log("API Response:", response);
       reset();
     } catch (error) {
       console.error("API Error:", error);
@@ -146,6 +144,7 @@ const AddNewGiftForm = () => {
       className: "foo-bar text-xs font-light",
     });
   };
+
   return (
     <div className="max-w-lg w-full  mx-auto p-6 bg-white rounded shadow">
       <form onSubmit={handleSubmit(onSubmit)}>

@@ -56,6 +56,7 @@ const resolvers = {
 
   Mutation: {
     createCraftman: async (_, { craftmanData }) => {
+      console.log("lgging from mutation resolver", craftmanData);
       try {
         // Check if the craftman already exists based on the name
         const existingCraftman = await prisma.craftmen.findFirst({
@@ -76,6 +77,175 @@ const resolvers = {
       } catch (error) {
         console.error("Error creating craftman:", error);
         throw new Error("Failed to create craftman");
+      }
+    },
+
+    createOccasion: async (_, { occasionData }) => {
+      console.log("logging from resolvers", occasionData);
+      try {
+        const existingOccasion = await prisma.occasion.findFirst({
+          where: { name: occasionData.name },
+        });
+
+        if (existingOccasion) {
+          throw new Error("Occasion already exists");
+        }
+
+        const occasion = await prisma.occasion.create({
+          data: occasionData,
+        });
+
+        return occasion;
+      } catch (error) {
+        console.error("Error creating occasion:", error);
+        throw new Error("Failed to create occasion");
+      }
+    },
+
+    createCategory: async (_, { categoryData }) => {
+      try {
+        // Check if the category already exists based on the name
+        const existingCategory = await prisma.categories.findFirst({
+          where: { category_name: categoryData.category_name },
+        });
+
+        // If the category already exists, return an error message
+        if (existingCategory) {
+          throw new Error("Category already exists");
+        }
+
+        // If the category does not exist, create a new category
+        const category = await prisma.categories.create({
+          data: categoryData,
+        });
+
+        return category;
+      } catch (error) {
+        console.error("Error creating category:", error);
+        throw new Error("Failed to create category");
+      }
+    },
+
+    createGift: async (_, { giftData }) => {
+      const { category_id, occasionIds, ...giftDetails } = giftData;
+      console.log(
+        "createGift about to be sent to tables:",
+        giftData.category_id,
+        giftData.occasionIds,
+        giftDetails
+      );
+      try {
+        // Start a transaction to ensure atomicity
+        const result = await prisma.$transaction(async (prisma) => {
+          // Step 1: Create the gift in the products table
+          const createdGift = await prisma.products.create({
+            data: {
+              craftman_id: giftData.craftman_id,
+              sku: giftData.sku,
+              giftname: giftData.giftname,
+              description: giftData.description,
+              price: giftData.price,
+              url: giftData.url,
+            },
+          });
+
+          // Extract the gift_id
+          const gift_id = createdGift.gift_id;
+
+          // Step 2: Create the entry in the productCategory table
+          if (giftData.category_id) {
+            await prisma.productCategory.create({
+              data: {
+                gift_id: gift_id,
+                category_id: giftData.category_id,
+              },
+            });
+          }
+
+          // Step 3: Create entries in the productOccasion table
+          if (giftData.occasionIds && giftData.occasionIds.length > 0) {
+            await prisma.productOccasion.createMany({
+              data: giftData.occasionIds.map((occasionId) => ({
+                productId: gift_id,
+                occasionId: occasionId,
+              })),
+            });
+          }
+
+          // Return the created gift
+          return createdGift;
+        });
+
+        // If the transaction is successful, return the created gift
+        return result;
+      } catch (error) {
+        console.error("Prisma Error:", error);
+        throw new Error("Failed to create new gift");
+      }
+    },
+
+    createWishItem: async (_, { wishData }) => {
+      const { user_id, product_id } = wishData;
+
+      console.log("Logging createwishItem", user_id, product_id);
+      try {
+        // Create a new wishlist entry
+        const wishlist = await prisma.wishlist.create({
+          data: { user_id },
+        });
+        console.log(wishlist);
+        // Check if the wishlist entry was created successfully
+        if (wishlist && wishlist.wishlist_id) {
+          // Create a wishlist item entry
+          const wishlistItem = await prisma.wishlistitems.create({
+            data: {
+              wishlist_id: wishlist.wishlist_id,
+              product_id,
+            },
+          });
+
+          // Return the created wishlist item
+          console.log(wishlistItem);
+          return wishlistItem;
+        } else {
+          throw new Error("Wishlist creation failed");
+        }
+      } catch (error) {
+        console.error("Error in createWishItem resolver:", error);
+        throw new Error("Failed to create wishlist item");
+      }
+    },
+    removeFromWishList: async (_, { wishlistRemoveData }) => {
+      const { wishlist_id } = wishlistRemoveData;
+      console.log("logging from remove :", wishlist_id);
+      try {
+        // Delete the specified wishlist item
+        await prisma.wishlistitems.deleteMany({
+          where: {
+            wishlist_id: wishlist_id,
+          },
+        });
+
+        // Check if there are any items left in the wishlist
+        const remainingItems = await prisma.wishlistitems.findMany({
+          where: {
+            wishlist_id: wishlist_id,
+          },
+        });
+
+        // If no items left, delete the wishlist
+        if (remainingItems.length === 0) {
+          await prisma.wishlist.delete({
+            where: {
+              wishlist_id: wishlist_id,
+            },
+          });
+        }
+
+        return { message: "Wishlist item removed successfully" };
+      } catch (error) {
+        console.error("Error in removeFromWishList resolver:", error);
+        throw new Error("Error removing wishlist item");
       }
     },
   },

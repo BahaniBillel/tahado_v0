@@ -3,8 +3,9 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addOccasionAPI } from "../../app/api/occasionAPIs"; // Update with the correct path to your API
+// import { addOccasionAPI } from "../../app/api/occasionAPIs"; // Update with the correct path to your API
 import { toast } from "react-toastify";
+import { GraphQLClient } from "graphql-request"; // Import GraphQLClient
 
 // Your Zod validation schema
 const occasionSchema = z.object({
@@ -17,39 +18,35 @@ const OccasionForm = () => {
     resolver: zodResolver(occasionSchema),
   });
   const { errors } = formState;
+  const createOccasion = async (occasionData) => {
+    console.log("logging frim createOccasion", occasionData);
+    const client = new GraphQLClient("http://localhost:3001/graphql"); // Update with your GraphQL endpoint
+
+    const mutation = `
+      mutation CreateOccasion($occasionData: OccasionInput!) {
+        createOccasion(occasionData: $occasionData) {
+          name
+        }
+      }
+    `;
+
+    try {
+      const data = await client.request(mutation, { occasionData });
+      console.log("Occasion created successfully:", data.createOccasion);
+      toast.success("Occasion created successfully");
+    } catch (error) {
+      console.error("Error creating occasion:", error);
+      toast.error("Something went wrong while creating the occasion");
+    }
+  };
 
   const onSubmit = async (data) => {
+    console.log("data about to submit", data);
     try {
-      const response = await addOccasionAPI(data);
-      console.log(response.data);
-
-      // Show success toast
-      toast.success("New Occasion added to the database!", {
-        position: "top-right",
-        autoClose: 3000, // 3 seconds
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-
-        theme: "light",
-      });
-
-      // Clear the form fields
+      await createOccasion(data);
       reset();
     } catch (error) {
-      // handle error, show an error message
       console.error(error);
-      toast.error("Failed to add Occasion to the database", {
-        position: "top-right",
-        autoClose: 3000, // 3 seconds
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
     }
   };
 

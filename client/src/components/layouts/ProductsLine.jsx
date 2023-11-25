@@ -85,8 +85,6 @@ const ProductsLine = ({
   // Filter giftsData based on occasionId
 
   const filteredGiftsData = giftsData.filter((gift) => {
-    // console.log("gift.occasions", gift.occasions);
-    // console.log("occasionId", occasionName);
     return gift.occasions.some((occasion) =>
       occasion.occasion.name.includes(occasionName)
     );

@@ -1,22 +1,18 @@
 import { gql } from "@apollo/client";
-import {GraphQLClient} from "graphql-request"
+import { GraphQLClient } from "graphql-request";
 
-const client = new GraphQLClient("http://localhost:3001/graphql")
+const client = new GraphQLClient("http://localhost:3001/graphql");
 
-
-
-
-
-export async function getUsers(){
+export async function getUsers() {
   const query = gql`
-  
-  query Users {
-  users {
-    first_name
-  }
-}`
-const {users}= await client.request(query)
-return users
+    query Users {
+      users {
+        first_name
+      }
+    }
+  `;
+  const { users } = await client.request(query);
+  return users;
 }
 
 export const GET_CATEGORIES = gql`
@@ -51,6 +47,7 @@ export const GET_WISHLIST = gql`
 export const GET_OCCASIONS = gql`
   query Occasions {
     occasions {
+      id
       name
     }
   }

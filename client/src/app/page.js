@@ -16,23 +16,36 @@ export default async function Home() {
   // Use the client instance to query data for occasions
   const { data: occasionsData } = await client.query({
     query: GET_OCCASIONS,
+    fetchPolicy: "network-only",
+    context: {
+      fetchOptions: {
+        next: { revalidate: 5 },
+      },
+    },
   });
 
   // Use the client instance to query data for product occasions
   const { data: productOccasionData } = await client.query({
     query: GET_PORODUCT_OCCASION,
+    fetchPolicy: "network-only",
+    context: {
+      fetchOptions: {
+        next: { revalidate: 5 },
+      },
+    },
   });
 
-  console.log("productOccasionData", productOccasionData);
+  console.log("productOccasionData from home", productOccasionData);
 
   const occasionsArray = occasionsData.occasions.map(
     (occasion) => occasion.name
   );
 
+  console.log(productOccasionData.products.length);
   return (
     <main className="">
       <TextGraphql />
-
+      {productOccasionData.products.length}
       <ProductsLine
         giftsData={productOccasionData.products}
         lineID={1}
