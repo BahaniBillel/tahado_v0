@@ -4,8 +4,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // import { addOccasionAPI } from "../../app/api/occasionAPIs"; // Update with the correct path to your API
-import { toast } from "react-toastify";
+
 import { GraphQLClient } from "graphql-request"; // Import GraphQLClient
+import { toast } from "sonner";
 
 // Your Zod validation schema
 const occasionSchema = z.object({
@@ -33,7 +34,10 @@ const OccasionForm = () => {
     try {
       const data = await client.request(mutation, { occasionData });
       console.log("Occasion created successfully:", data.createOccasion);
-      toast.success("Occasion created successfully");
+      toast.success(
+        ` ${data.createOccasion.name},
+         was successfully created in occasions table.`
+      );
     } catch (error) {
       console.error("Error creating occasion:", error);
       toast.error("Something went wrong while creating the occasion");
@@ -51,7 +55,7 @@ const OccasionForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto mt-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto">
       <div className="mb-4">
         <label
           htmlFor="name"

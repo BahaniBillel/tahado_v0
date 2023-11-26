@@ -45,6 +45,7 @@ const CraftmanForm = () => {
     console.log("data about to submit", data);
     try {
       await createCraftman(data);
+      toast.success(data, "  was successfully added to craftman table");
       reset();
     } catch (error) {
       console.error(error);

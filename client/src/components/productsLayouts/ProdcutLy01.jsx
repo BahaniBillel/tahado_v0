@@ -108,25 +108,34 @@ function ProductLy01({
 
       // If the product is not currently liked, add it to the wishlist
       if (!heart) {
+        console.log("Wishlist Data:", wishlistData);
         const response = await client.request(mutation, { wishData });
 
         dispatch(incrementLikes(product));
       } else {
         // Remove from wishlist logic
-        const wishlistId = parseInt(wishlistData.wishlist_id, 10);
-        if (wishlistId == null) {
-          console.error("Wishlist ID is null");
-          return; // Exit the function if wishlistId is null
+        const wishlistWithItem = wishlistData.wishlist.find((wishlist) =>
+          wishlist.wishlistitems.some((item) => item.product_id === productId)
+        );
+
+        if (!wishlistWithItem) {
+          console.error("Wishlist item not found for product ID:", productId);
+          return;
         }
-        // TODO: wishlistI is printed NaN in console solve the issue today
+
+        const wishlistId = parseInt(wishlistWithItem.wishlist_id, 10);
+        if (isNaN(wishlistId)) {
+          console.error("Invalid Wishlist ID for product ID:", productId);
+          return;
+        }
+
         console.log("Removing from wishlist with ID:", wishlistId);
-        // If the product is currently liked, remove it from the wishlist
+
         const response = await client.request(removeWishlistMutation, {
-          wishlistRemoveData,
+          wishlistRemoveData: { wishlist_id: wishlistId },
         });
 
         console.log("Removed from wishlist:", response);
-
         dispatch(decrementLikes({ giftName }));
       }
 

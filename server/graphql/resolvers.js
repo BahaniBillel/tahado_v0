@@ -205,7 +205,7 @@ const resolvers = {
           });
 
           // Return the created wishlist item
-          console.log(wishlistItem);
+
           return wishlistItem;
         } else {
           throw new Error("Wishlist creation failed");
@@ -217,7 +217,7 @@ const resolvers = {
     },
     removeFromWishList: async (_, { wishlistRemoveData }) => {
       const { wishlist_id } = wishlistRemoveData;
-      console.log("logging from remove :", wishlist_id);
+      console.log("logging from remove resolver :", wishlist_id);
       try {
         // Delete the specified wishlist item
         await prisma.wishlistitems.deleteMany({

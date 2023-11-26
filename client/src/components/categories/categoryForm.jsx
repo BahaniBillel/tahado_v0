@@ -60,7 +60,7 @@ const CategoryForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto mt-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto ">
       <div className="mb-4">
         <label
           htmlFor="category_name"
