@@ -306,6 +306,7 @@ const resolvers = {
       prisma.productCategory.findMany({
         where: { category_id: parent.category_id },
       }),
+
     subcategories: (parent) =>
       prisma.categories.findMany({
         where: { parent_category_id: parent.category_id },
@@ -336,6 +337,15 @@ const resolvers = {
       prisma.products.findUnique({ where: { gift_id: parent.productId } }),
     occasion: (parent) =>
       prisma.occasion.findUnique({ where: { id: parent.occasionId } }),
+  },
+
+  ProductCategory: {
+    product: (parent) =>
+      prisma.products.findUnique({ where: { gift_id: parent.product_id } }),
+    category: (parent) =>
+      prisma.categories.findUnique({
+        where: { category_id: parent.category_id },
+      }),
   },
   // ... other resolvers for mutations or complex types
 };

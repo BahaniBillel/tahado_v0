@@ -40,7 +40,7 @@ const ProductsLine = ({
 
     breakpoints: {
       "(min-width: 400px)": {
-        slides: { perView: 2, spacing: 0 },
+        slides: { perView: 1.2, spacing: 10 },
         loop: true,
         mode: "free",
       },

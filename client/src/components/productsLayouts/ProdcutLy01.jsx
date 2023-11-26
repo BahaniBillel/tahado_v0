@@ -150,10 +150,10 @@ function ProductLy01({
   return (
     <div className="w-80 group">
       <div
-        className={` ${"w-80" || width}  ${
+        className={` ${"w-50" || width}  ${
           "h-80" || length
         }  group  border border-charcoal/20 hover:shadow-lg p-2 relative rounded-sm 
-    hover:-translate-y-1 transition-all duration-150 ease-in-out cursor-pointer`}
+   transition-all duration-150 ease-in-out cursor-pointer`}
       >
         {feature ? (
           <span

@@ -10,8 +10,27 @@ import DynamicPageSkelton from "../../../components/DynamicPageSkelton";
 // APIs
 import { FetchGifts } from "../../api/giftsAPIs";
 
+// GraphQL
+import { useMutation, useQuery } from "@apollo/client";
+import { getClient } from "../../../app/lib/client";
+import { GET_PRODUCTS } from "../../../graphql/querries";
+
 async function GiftDetail({ params }) {
-  const gifts = await FetchGifts();
+  const client = getClient();
+
+  const { data: productsData } = await client.query({
+    query: GET_PRODUCTS,
+    fetchPolicy: "network-only",
+    context: {
+      fetchOptions: {
+        next: { revalidate: 5 },
+      },
+    },
+  });
+
+  console.log("dynamic page :", productsData);
+
+  const gifts = await productsData.products;
   const pageUrl = params.name;
 
   const matchingProduct = gifts.find(
@@ -30,7 +49,7 @@ async function GiftDetail({ params }) {
       <DynamicPageSkelton
         data={matchingProduct}
         giftId={matchingProduct.gift_id}
-        addItem={addItemToBasket}
+        // addItem={addItemToBasket}
       />
 
       <section className="h-80 py-1 bg-coralPinkLight/50 flex flex-col items-center justify-start px-4 mt-10 ">

@@ -20,7 +20,10 @@ const CheckoutProduct = ({ product }) => {
       <p className="text-gray-600 mb-2">SKU: {sku}</p>
       <ul className="list-disc pl-6 mb-4 right-aligned-bullets ">
         {occasions.map((occasion) => (
-          <li key={occasion.occasion.name} className="text-gray-600 text-right">
+          <li
+            key={occasion.occasion.name}
+            className="text-charcoal/60 text-right"
+          >
             {occasion.occasion.name}
           </li>
         ))}

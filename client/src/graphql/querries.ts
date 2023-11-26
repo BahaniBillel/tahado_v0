@@ -1,9 +1,5 @@
 import { gql } from "@apollo/client";
 
-
-
-
-
 export const GET_CATEGORIES = gql`
   query Categories {
     categories {
@@ -89,6 +85,34 @@ export const GET_WISHLIST_BY_USERID = gql`
           price
           description
           sku
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCTS = gql`
+  query Get_Products {
+    products {
+      gift_id
+      craftman_id
+      giftname
+      description
+      price
+      url
+      sku
+
+      occasions {
+        occasion {
+          name
+        }
+      }
+      craftman {
+        name
+      }
+      productCategory {
+        category {
+          category_name
         }
       }
     }

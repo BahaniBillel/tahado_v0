@@ -29,7 +29,7 @@ export default async function Wishlist() {
 
   //  Bring the wishlist product by user_id
   return (
-    <div>
+    <div className="max-w-5xl mx-auto">
       {getwishlistbyuserid.wishlistByUser.map((wishlistItem) => (
         <div key={wishlistItem.wishlist_id}>
           <p>Wishlist ID: {wishlistItem.wishlist_id}</p>
