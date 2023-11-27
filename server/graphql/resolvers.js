@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const bcrypt = require("bcrypt");
 
 const resolvers = {
   Query: {
@@ -246,6 +247,53 @@ const resolvers = {
       } catch (error) {
         console.error("Error in removeFromWishList resolver:", error);
         throw new Error("Error removing wishlist item");
+      }
+    },
+
+    createUser: async (_, { userDataInput }) => {
+      console.log(userDataInput);
+
+      // Validate input
+      if (!userDataInput.email) {
+        throw new Error("Email is required");
+      }
+
+      // Hash the password
+      const saltRounds = 10;
+      try {
+        const hashedPassword = await bcrypt.hash(
+          userDataInput.password_hash,
+          saltRounds
+        );
+
+        // Replace the plaintext password with the hashed password
+        userDataInput.password_hash = hashedPassword;
+
+        // Create the user
+        const user = await prisma.users.create({
+          data: userDataInput,
+        });
+
+        // Set the first user as admin, and the second and third as moderators
+        if (user.user_id === 1) {
+          await prisma.users.update({
+            where: { user_id: user.user_id },
+            data: { roles: ["admin"] },
+          });
+        } else if (user.user_id >= 2 && user.user_id <= 5) {
+          await prisma.users.update({
+            where: { user_id: user.user_id },
+            data: { roles: ["moderator"] },
+          });
+        }
+
+        return user;
+      } catch (error) {
+        console.error("Prisma Error:", error);
+        throw new Error(`Failed to create user: ${error.message}`); // Throw an error
+      } finally {
+        // Close the Prisma client
+        await prisma.$disconnect();
       }
     },
   },

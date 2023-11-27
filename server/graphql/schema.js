@@ -112,6 +112,14 @@ const typeDefs = `#graphql
   createGift(giftData: GiftInput!): Product!
   createWishItem(wishData:WishInput!):WishlistProductResponse!
   removeFromWishList(wishlistRemoveData: WishlistRemoveInput!): WishlistItem!
+  createUser(userDataInput:UserDataInput!):User!
+}
+
+input UserDataInput{
+  email:String!
+  password_hash:String!
+  first_name:String!
+  last_name:String!
 }
 
 input WishlistRemoveInput {

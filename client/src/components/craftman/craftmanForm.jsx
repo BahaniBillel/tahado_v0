@@ -23,7 +23,7 @@ const CraftmanForm = () => {
   const createCraftman = async (craftmanData) => {
     const client = new GraphQLClient("http://localhost:3001/graphql"); // Update with your GraphQL endpoint
 
-    const query = `
+    const mutation = `
       mutation CreateCraftman($craftmanData: CraftmanInput!) {
         createCraftman(craftmanData: $craftmanData) {
           name
@@ -32,7 +32,7 @@ const CraftmanForm = () => {
     `;
 
     try {
-      const data = await client.request(query, { craftmanData });
+      const data = await client.request(mutation, { craftmanData });
       console.log("Craftsman created successfully:", data.createCraftman);
       toast.success("Craftsman created successfully");
     } catch (error) {

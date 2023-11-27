@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { z, ZodError } from "zod";
 import GoogleSignInButton from "../GoogleSignInButton";
 import Link from "next/link";
+import { gql, GraphQLClient } from "graphql-request";
+import { toast } from "sonner";
 
 // Create Zod schema
 const userSchema = z.object({
@@ -26,19 +28,46 @@ const RegisterForm = () => {
     });
   };
 
+  // Graphql Implementations
+
+  const createUser = async (userDataInput) => {
+    const client = new GraphQLClient("http://localhost:3001/graphql");
+    const mutation = gql`
+      mutation Mutation($userDataInput: UserDataInput!) {
+        createUser(userDataInput: $userDataInput) {
+          email
+          password_hash
+          first_name
+          last_name
+        }
+      }
+    `;
+
+    try {
+      const data = await client.request(mutation, { userDataInput });
+      console.log("user created successfully:", data.createUser);
+      toast.success("user created successfully");
+      return data.createUser; // Return the created user data
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast.error("Something went wrong while creating the user");
+      throw error; // Rethrow the error to handle it in handleSubmit
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Validate data using Zod schema
       const parsedData = userSchema.parse(formData);
+      const user = await createUser(parsedData);
 
-      const response = await CreateUserAPI(parsedData);
-      if (response.status === 201) {
+      // Check if user is returned
+      if (user) {
+        setFormData({}); // Clear the form after successful submission
+        setErrors({});
         router.push("/thankyou");
       }
-      setFormData({});
-      setErrors({});
     } catch (error) {
       if (error instanceof ZodError) {
         const newErrors = {};

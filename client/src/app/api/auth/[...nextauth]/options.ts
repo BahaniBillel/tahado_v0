@@ -47,21 +47,21 @@ export const options: NextAuthOptions = {
         if (!existingUser) {
           return null;
         }
-        // const passwordMatch = await compare(
-        //   credentials.password,
-        //   existingUser.password_hash
-        // );
-        // if (!passwordMatch) {
-        //   return null;
-        // }
+        const passwordMatch = await compare(
+          credentials.password,
+          existingUser.password_hash
+        );
+        if (!passwordMatch) {
+          return null;
+        }
 
-        // // Log the result for debugging
-        // console.log("Is password match:", passwordMatch);
+        // Log the result for debugging
+        console.log("Is password match:", passwordMatch);
 
-        // if (!passwordMatch) {
-        //   console.log("Password does not match");
-        //   return null;
-        // }
+        if (!passwordMatch) {
+          console.log("Password does not match");
+          return null;
+        }
 
         // Include user roles in the returned object
         const userRoles = existingUser.roles || []; // Replace 'roles' with the actual field in your user model
