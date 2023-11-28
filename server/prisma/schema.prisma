@@ -121,6 +121,7 @@ model products {
   description     String?
   price           Decimal           @db.Decimal(10, 2)
   url             String?           @db.VarChar
+  Main_Image      String?           @db.VarChar
   productCategory ProductCategory[]
   orderitems      orderitems[]
   productreviews  productreviews[]
@@ -145,3 +146,27 @@ model ProductOccasion {
 
   @@id([productId, occasionId])
 }
+
+//  to be added later on 
+
+//  run prisma migrate dev after updating 
+
+// model inventory {
+//   inventory_id   Int       @id @default(autoincrement())
+//   product_id     Int
+//   quantity       Int       @default(0)  // Current stock level
+//   reserved       Int       @default(0)  // Quantity reserved for orders
+//   available      Int       @default(0)  // Quantity available for new orders
+//   minimum_level  Int       @default(0)  // Minimum stock level for alerts
+//   last_updated   DateTime  @default(now()) // Last inventory update
+//   products       products? @relation(fields: [product_id], references: [gift_id], onDelete: Cascade, onUpdate: Cascade)
+
+//   @@unique([product_id])
+// }
+
+// model products {
+//   gift_id    Int         @id @default(autoincrement())
+//   // ... other existing fields
+//   inventory  inventory?  // Relation to inventory
+//   // ... rest of the fields
+// }

@@ -4,6 +4,12 @@ import ReactStarsComp from "../components/ReactStars";
 import { MdLocalOffer } from "react-icons/md";
 import MyDisclosure from "../utils/Disclosure";
 import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import fetchImagesFromS3 from "../utils/fetchImagesFromS3";
+// Form submission Prequesites
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { request, gql } from "graphql-request";
 
 import {
   BiLogoInstagramAlt,
@@ -14,81 +20,89 @@ import {
 
 import NextJsCarousel from "../utils/ResponsiveCarousel";
 
-function DynamicPageSkelton({ data, giftId, addItem }) {
+function DynamicPageSkelton({ data, giftId }) {
   // FETCHING IMAGES FROM AMAEZON S3
   const [images, setImages] = useState([]);
   const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
   const [open, setOpen] = React.useState(false); // For Yetanother lightbox
 
-  const s3Client = new S3Client({
-    region: process.env.NEXT_PUBLIC_REGION,
-    credentials: {
-      accessKeyId: process.env.NEXT_PUBLIC_ACCESS_KEY_ID,
-      secretAccessKey: process.env.NEXT_PUBLIC_SECRET_ACCESS_KEY,
+  useEffect(() => {
+    const loadImages = async () => {
+      const images = await fetchImagesFromS3(giftId);
+      setGiftImageMap((prevMap) => ({ ...prevMap, [giftId]: images }));
+    };
+
+    loadImages();
+  }, [giftId]);
+
+  const relevantImages = giftImageMap[giftId] || [];
+
+  // The first image in the array of the relevant product images
+  const MainImage = relevantImages[0];
+
+  // Form Submission setup
+
+  // TODO: see the logic
+  //  the gift data is already present in data, so we need to integrate  quantity and
+  // date and expression into data and descrese the from invontory table and decrease
+  // it from order table and the related tables also, then submit the mix
+  console.log("logging from gift product", data);
+
+  const { giftname, price, description, gift_id } = data;
+  const formSchema = z.object({
+    giftname: z.string(),
+    price: z.number(),
+    description: z.string(),
+    gift_id: z.number(),
+    quantity: z.number().min(1, "Quantity must be at least 1"),
+    date: z.string().min(1, "Date is required"),
+    expression: z.string().optional(),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      giftname: data.giftname,
+      price: data.price,
+      description: data.description,
+      gift_id: data.gift_id,
+      // Set default values for other fields if necessary
     },
   });
 
-  // Now, you can use giftImageMap[data.gift_id] to get the images for the given gift
+  const addToOrder = async (addToOrder) => {
+    const client = new GraphQLClient("http://localhost:3001/graphql");
 
-  const getImages = async () => {
-    try {
-      const params = {
-        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-        Prefix: "gifts_photos/",
-      };
-
-      console.log("Sending ListObjectsCommand with params:", params);
-
-      const command = new ListObjectsCommand(params);
-      const imagesData = await s3Client.send(command);
-
-      if (imagesData && imagesData.Contents) {
-        const imageObjects = imagesData.Contents;
-
-        let tempGiftImageMap = {};
-
-        const { gift_id } = data;
-
-        // New logic to map images to gifts by gift_id
-        const giftImages = imageObjects.filter(
-          (img) =>
-            img.Key.startsWith(`gifts_photos/gift_${gift_id}/`) &&
-            !img.Key.endsWith("/") &&
-            (img.Key.toLowerCase().endsWith(".jpg") ||
-              img.Key.toLowerCase().endsWith(".png")) // New condition
-        );
-
-        tempGiftImageMap[gift_id] = giftImages.map(
-          (img) =>
-            `https://tahadobucket.s3.eu-central-1.amazonaws.com/${img.Key}`
-        );
-
-        // Save the gift-image mapping and the images
-        const actualImages = imageObjects.filter(
-          (obj) =>
-            obj.Key.toLowerCase().endsWith(".jpg") ||
-            obj.Key.toLowerCase().endsWith(".png")
-        );
-
-        setGiftImageMap(tempGiftImageMap);
-        console.log("acrual images", actualImages);
-        setImages(actualImages); // Only set actual images, not folder paths
-        console.log("images", images);
+    const mutation = `mutation CreateGift($giftData: GiftInput!) {
+  createGift(giftData: $giftData) {
+    craftman_id
+    sku
+    giftname
+    description
+    price
+    url
+    occasions {
+      occasion {
+        id
       }
-    } catch (error) {
-      console.log("logging error:", error);
     }
+    productCategory {
+      category {
+        category_id
+      }
+    }
+  }
+}`;
   };
-
-  useEffect(() => {
-    getImages();
-    console.log("Updated images:", images);
-  }, [images]);
-
-  // Utilize the giftId to extract relevant images from giftImageMap
-  const relevantImages = giftImageMap[giftId] || [];
-
-  console.log("logging images to find out :", relevantImages);
+  const onSubmit = (formData) => {
+    console.log(formData);
+    // Submit formData to your backend
+  };
 
   return (
     <div>
@@ -98,9 +112,12 @@ function DynamicPageSkelton({ data, giftId, addItem }) {
           <NextJsCarousel data={relevantImages} />
         </div>
         {/* Left side : Content */}
-        <div
+        {/* //TODO: This needs to be form that send information to Order Table in */}
+        {/* database */}
+        <form
           className=" w-full md:w-2/5 text-right px-5 pt-5 md:px-10 
         flex flex-col flex-nowrap space-y-4 items-end order-2 md:order-1"
+          onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-2xl md:text-3xl font">{data.giftname}</h2>
           <p className="para">{data.description}</p>
@@ -137,7 +154,7 @@ function DynamicPageSkelton({ data, giftId, addItem }) {
           />
 
           <div className="flex flex-row space-x-3 w-full my-10 ">
-            <select name="" id="" className="input">
+            <select name="quantity" id="" className="input">
               <option value="1">1</option>
               <option value="1">2</option>
               <option value="1">3</option>
@@ -148,7 +165,6 @@ function DynamicPageSkelton({ data, giftId, addItem }) {
               className="border px-6 py-1 rounded-sm text-sm font-light bg-charcoal
              text-turquoise hover:text-coralPinkLight hover:bg-charcoal hover:border-charcoal
              transition-all duration-150 ease-in-out whitespace-pre "
-              onClick={addItem}
             >
               أضف إلى السلة
             </button>
@@ -199,7 +215,7 @@ function DynamicPageSkelton({ data, giftId, addItem }) {
               <p>: شارك المنتج </p>
             </div>
           </div>
-        </div>
+        </form>
       </section>
 
       <section className="  w-full flex flex-col   md:flex-row md:space-x-10 mt-10 pt-16 px-4">

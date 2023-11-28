@@ -15,14 +15,7 @@ const typeDefs = `#graphql
     wishlistByUser(userId: Int!): [Wishlist!]!
   }
 
-  type Order {
-    order_id: ID!
-    user_id: Int
-    order_date: String
-    total_amount: Float
-    orderitems: [OrderItem!]!
-    user: User
-  }
+ 
 
   type PaymentMethod {
     payment_method_id: ID!
@@ -113,7 +106,20 @@ const typeDefs = `#graphql
   createWishItem(wishData:WishInput!):WishlistProductResponse!
   removeFromWishList(wishlistRemoveData: WishlistRemoveInput!): WishlistItem!
   createUser(userDataInput:UserDataInput!):User!
+   addToOrder(addToOrder: AddOrderItemInput!): AddOrderItemResponse!
+
 }
+input AddOrderItemInput {
+  order_id: Int!
+  product_id: Int!
+  quantity: Int!
+}
+
+type AddOrderItemResponse {
+  order: Order
+  orderItem: OrderItem
+}
+
 
 input UserDataInput{
   email:String!
@@ -146,6 +152,7 @@ input GiftInput {
     description: String
     price: Float!
     url: String
+    main_image:String!
     category_id: Int!  
     occasionIds: [Int!]
 }
@@ -169,6 +176,15 @@ input CraftmanInput {
     # Add other fields as needed
   }
 
+   type Order {
+    order_id: ID!
+    user_id: Int
+    order_date: String
+    total_amount: Float
+    orderitems: [OrderItem!]!
+    user: User
+  }
+
   type OrderItem {
     item_id: ID!
     order_id: Int
@@ -187,6 +203,7 @@ input CraftmanInput {
     description: String
     price: Float!
     url: String
+    main_image: String!
     productCategory: [ProductCategory!]!
     orderitems: [OrderItem!]!
     productreviews: [ProductReview!]!

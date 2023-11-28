@@ -9,7 +9,7 @@ export default function ThankYou() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push("/");
+      router.push("/sign-in");
     }, 2000);
 
     return () => clearTimeout(timer);

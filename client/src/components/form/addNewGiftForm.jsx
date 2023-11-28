@@ -6,8 +6,18 @@ import { z } from "zod";
 
 import { toast } from "react-toastify";
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_CATEGORIES, GET_OCCASIONS } from "../../graphql/querries"; // Import your queries
+import {
+  GET_CATEGORIES,
+  GET_OCCASIONS,
+  GET_PRODUCTS,
+} from "../../graphql/querries"; // Import your queries
 import { GraphQLClient } from "graphql-request";
+
+// AWS S3 IMPORTS
+
+import { useEffect, useState } from "react";
+import fetchImagesFromS3 from "../../utils/fetchImagesFromS3";
+
 const productSchema = z.object({
   giftname: z.string().max(100),
   craftman_id: z.number().optional(),
@@ -31,6 +41,54 @@ const AddNewGiftForm = () => {
     error: occasionError,
   } = useQuery(GET_OCCASIONS);
 
+  const {
+    data: productsData,
+    loading: oproductsLoading,
+    error: productsError,
+  } = useQuery(GET_PRODUCTS);
+
+  console.log(productsData);
+
+  //.......................... LOGIC FOR FETCHING IMAGES FROM AWS S3
+  // FETCHING IMAGES FROM AMAEZON S3
+
+  const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
+  const [productsLength, setProductsLength] = useState(0);
+  const [giftNum, setGiftNum] = useState(0);
+  // Fetching the length of the products from database
+  const giftId = giftNum;
+
+  useEffect(() => {
+    if (productsData && productsData.products) {
+      const ProductsLength = productsData.products.length;
+      setProductsLength(ProductsLength);
+      setGiftNum(ProductsLength + 1);
+    }
+  }, [productsData]); // Add productsData to the dependency array
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const images = await fetchImagesFromS3(giftId);
+
+      if (images && images.length > 0) {
+        setGiftImageMap((prevMap) => ({ ...prevMap, [giftId]: images }));
+      }
+    };
+
+    if (giftId) {
+      loadImages();
+    }
+  }, [giftId]);
+
+  const relevantImages = giftImageMap[giftId] || [];
+
+  // The first image in the array of the relevant product images
+  const MainImage = relevantImages[0];
+
+  console.log("logging  the main image", relevantImages, giftId);
+
+  //..................................  THE END OF LOGIC
+
   const categories = categoryData?.categories || [];
   const occasions = occasionData?.occasions || [];
   // Logic for Handling Form inputs
@@ -47,9 +105,7 @@ const AddNewGiftForm = () => {
     },
     shouldUseNativeValidation: true,
   });
-  // Checkbox change handler
-  // Logic for Fetching and Handling data from database
-  // const [occasions, setOccasions] = React.useState([]);
+
   const [selectedOccasions, setSelectedOccasions] = React.useState([]);
   const handleOccasionChange = (event) => {
     if (event.target.checked) {
@@ -71,6 +127,7 @@ const AddNewGiftForm = () => {
     description
     price
     url
+    main_image
     occasions {
       occasion {
         id
@@ -122,6 +179,7 @@ const AddNewGiftForm = () => {
       ...data,
       category_id: category_id,
       occasionIds,
+      main_image: MainImage,
     };
 
     console.log("before deleting cat", apiData);

@@ -49,7 +49,6 @@ async function GiftDetail({ params }) {
       <DynamicPageSkelton
         data={matchingProduct}
         giftId={matchingProduct.gift_id}
-        // addItem={addItemToBasket}
       />
 
       <section className="h-80 py-1 bg-coralPinkLight/50 flex flex-col items-center justify-start px-4 mt-10 ">

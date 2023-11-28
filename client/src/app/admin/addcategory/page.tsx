@@ -17,9 +17,7 @@ async function AddCategory() {
   });
 
   console.log(categoryData);
-  if (categoryData.categories.length === 0) {
-    return <p>Loading categories...</p>;
-  }
+
   return (
     <div
       className="flex fle-row mx-auto justify-start 

@@ -133,6 +133,7 @@ const resolvers = {
         "createGift about to be sent to tables:",
         giftData.category_id,
         giftData.occasionIds,
+
         giftDetails
       );
       try {
@@ -147,6 +148,7 @@ const resolvers = {
               description: giftData.description,
               price: giftData.price,
               url: giftData.url,
+              Main_Image: giftData.main_image,
             },
           });
 
@@ -294,6 +296,64 @@ const resolvers = {
       } finally {
         // Close the Prisma client
         await prisma.$disconnect();
+      }
+    },
+    addToOrder: async (_, { addToOrder }) => {
+      const { order_id, product_id, quantity } = addToOrder;
+
+      try {
+        // Check if the specified order exists
+        const order = await prisma.orders.findUnique({
+          where: {
+            order_id: order_id,
+          },
+        });
+
+        if (!order) {
+          throw new Error(`Order with ID ${order_id} not found.`);
+        }
+
+        // Check if the product exists
+        const product = await prisma.products.findUnique({
+          where: {
+            gift_id: product_id,
+          },
+        });
+
+        if (!product) {
+          throw new Error(`Product with ID ${product_id} not found.`);
+        }
+
+        // Add the product to the order
+        const newOrderItem = await prisma.orderitems.create({
+          data: {
+            order_id: order_id,
+            product_id: product_id,
+            quantity: quantity,
+            subtotal: product.price * quantity, // Assuming the price is stored in the product record
+          },
+        });
+
+        // Optionally update the total amount of the order
+        const updatedOrder = await prisma.orders.update({
+          where: {
+            order_id: order_id,
+          },
+          data: {
+            // Assuming total_amount is a sum of all order item subtotals
+            total_amount: {
+              increment: product.price * quantity,
+            },
+          },
+        });
+
+        return {
+          order: updatedOrder,
+          orderItem: newOrderItem,
+        };
+      } catch (error) {
+        console.error("Error in addToOrder resolver:", error);
+        throw new Error("Failed to add item to order");
       }
     },
   },
