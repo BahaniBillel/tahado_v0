@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
 import {
   GET_CATEGORIES,
@@ -45,6 +45,7 @@ const AddNewGiftForm = () => {
     data: productsData,
     loading: oproductsLoading,
     error: productsError,
+    refetch: refetchProducts,
   } = useQuery(GET_PRODUCTS);
 
   console.log(productsData);
@@ -189,18 +190,12 @@ const AddNewGiftForm = () => {
     console.log("after deleting cat", apiData);
     try {
       await createGift(apiData);
-      await notify(apiData.giftname);
+      toast.success(`${data.giftname} was successfully added to the database`);
       reset();
+      refetchProducts();
     } catch (error) {
       console.error("API Error:", error);
     }
-  };
-
-  const notify = (input) => {
-    toast(`${input} has been added to your database`, {
-      position: toast.POSITION.BOTTOM_RIGHT,
-      className: "foo-bar text-xs font-light",
-    });
   };
 
   return (
@@ -268,6 +263,7 @@ const AddNewGiftForm = () => {
               // Other handling code here...
             }}
           >
+            <option value="">Select a category</option>
             {categories.map((category) => (
               <option key={category.category_id} value={category.category_name}>
                 {category.category_name}

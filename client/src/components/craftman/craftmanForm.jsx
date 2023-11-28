@@ -15,7 +15,7 @@ const craftmanSchema = z.object({
 });
 
 const CraftmanForm = () => {
-  const { handleSubmit, register, formState } = useForm({
+  const { handleSubmit, register, formState, reset } = useForm({
     resolver: zodResolver(craftmanSchema),
   });
   const { errors } = formState;
@@ -45,7 +45,7 @@ const CraftmanForm = () => {
     console.log("data about to submit", data);
     try {
       await createCraftman(data);
-      toast.success(data, "  was successfully added to craftman table");
+      toast.success(`${data.name} was successfully added to craftman table`);
       reset();
     } catch (error) {
       console.error(error);
