@@ -1,5 +1,5 @@
 import React from "react";
-import AddInventoryForm from "../../../../components/form/addInventoryForm";
+import AddInventoryForm from "../../../../../components/form/addInventoryForm";
 
 function InventoryInfo() {
   return <AddInventoryForm />;

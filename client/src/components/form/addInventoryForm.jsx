@@ -3,6 +3,7 @@ import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useRouter, useParams } from "next/navigation";
 
 import { toast } from "sonner";
 import { useMutation, useQuery } from "@apollo/client";
@@ -16,30 +17,30 @@ import { GraphQLClient } from "graphql-request";
 // AWS S3 IMPORTS
 
 import { useEffect, useState } from "react";
-import fetchImagesFromS3 from "../../utils/fetchImagesFromS3";
 
-const productSchema = z.object({
-  giftname: z.string().max(100),
-  craftman_id: z.number().optional(),
-  description: z.string(),
-  price: z.number(),
-  category: z.string().max(50),
-  url: z.string(),
-  occasion: z.union([z.string(), z.array(z.string())]),
-  sku: z.string().max(100),
+const InventorySchema = z.object({
+  quantity: z.number().min(0).max(1000).nonnegative(),
+  reserved: z.number().min(0).nonnegative(),
+  minimum_level: z.number().min(0).nonnegative(),
+  last_updated: z.string().refine(
+    (val) => {
+      // Check if the string can be converted to a valid date
+      const parsedDate = new Date(val);
+      return !isNaN(parsedDate.getTime());
+    },
+    {
+      message: "Invalid date format",
+    }
+  ),
 });
 
 const AddInventoryForm = () => {
-  const {
-    data: categoryData,
-    loading: categoryLoading,
-    error: categoryError,
-  } = useQuery(GET_CATEGORIES);
-  const {
-    data: occasionData,
-    loading: occasionLoading,
-    error: occasionError,
-  } = useQuery(GET_OCCASIONS);
+  // Page parameter
+  const params = useParams();
+  // const gid = router.query.gid;
+
+  const product_id = parseInt(params.gid);
+  console.log(product_id);
 
   const {
     data: productsData,
@@ -53,7 +54,6 @@ const AddInventoryForm = () => {
   //.......................... LOGIC FOR FETCHING IMAGES FROM AWS S3
   // FETCHING IMAGES FROM AMAEZON S3
 
-  const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
   const [productsLength, setProductsLength] = useState(0);
   const [giftNum, setGiftNum] = useState(0);
   // Fetching the length of the products from database
@@ -67,31 +67,8 @@ const AddInventoryForm = () => {
     }
   }, [productsData]); // Add productsData to the dependency array
 
-  useEffect(() => {
-    const loadImages = async () => {
-      const images = await fetchImagesFromS3(giftId);
-
-      if (images && images.length > 0) {
-        setGiftImageMap((prevMap) => ({ ...prevMap, [giftId]: images }));
-      }
-    };
-
-    if (giftId) {
-      loadImages();
-    }
-  }, [giftId]);
-
-  const relevantImages = giftImageMap[giftId] || [];
-
-  // The first image in the array of the relevant product images
-  const MainImage = relevantImages[0];
-
-  console.log("logging  the main image", relevantImages, giftId);
-
   //..................................  THE END OF LOGIC
 
-  const categories = categoryData?.categories || [];
-  const occasions = occasionData?.occasions || [];
   // Logic for Handling Form inputs
   const {
     register,
@@ -100,62 +77,35 @@ const AddInventoryForm = () => {
     control,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      occasion: [],
-    },
+    resolver: zodResolver(InventorySchema),
+
     shouldUseNativeValidation: true,
   });
 
-  const [selectedOccasions, setSelectedOccasions] = React.useState([]);
-  const handleOccasionChange = (event) => {
-    if (event.target.checked) {
-      setSelectedOccasions([...selectedOccasions, event.target.value]);
-    } else {
-      setSelectedOccasions(
-        selectedOccasions.filter((o) => o !== event.target.value)
-      );
-    }
-  };
-  const createGift = async (giftData) => {
+  const addInventory = async (addInventoryInput) => {
     const client = new GraphQLClient("http://localhost:3001/graphql");
 
-    const mutation = `mutation CreateGift($giftData: GiftInput!) {
-  createGift(giftData: $giftData) {
-    craftman_id
-    sku
-    giftname
-    description
-    price
-    url
-    main_image
-    occasions {
-      occasion {
-        id
-      }
-    }
-    productCategory {
-      category {
-        category_id
-      }
-    }
+    const mutation = `mutation AddInventory($addInventoryInput: AddInventoryInput!) {
+  addInventory(addInventoryInput: $addInventoryInput) {
+product_id
+    last_updated
+    minimum_level
+    quantity
+    reserved
   }
 }`;
 
     try {
-      // Convert categoryId to integer before sending
-      const categoryIdInt = parseInt(giftData.category_id, 10);
-
-      // Modify the giftData to use the converted categoryId
-      const modifiedGiftData = {
-        ...giftData,
-        category_id: categoryIdInt,
+      // Modify the inventoryData to sent
+      const modifiedInventoryData = {
+        ...addInventoryInput,
+        product_id,
       };
 
       const data = await client.request(mutation, {
-        giftData: modifiedGiftData,
+        addInventoryInput: modifiedInventoryData,
       });
-      console.log("Gift created successfully:", data.createGift);
+      // console.log("Gift created successfully:", data.createGift);
       toast.success("Gift created successfully");
     } catch (error) {
       console.error("Error creating gift:", error);
@@ -164,33 +114,11 @@ const AddInventoryForm = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("the data  about to be  addeed for  new gift", data);
-    const selectedCategory = categories.find(
-      (c) => c.category_name === data.category
-    );
-    const category_id = selectedCategory
-      ? parseInt(selectedCategory.category_id)
-      : null;
-
-    const occasionIds = occasions
-      .filter((occasion) => data.occasion.includes(occasion.name))
-      .map((occasion) => parseInt(occasion.id));
-
-    const apiData = {
-      ...data,
-      category_id: category_id,
-      occasionIds,
-      main_image: MainImage,
-    };
-
-    console.log("before deleting cat", apiData);
-
-    delete apiData.occasion;
-    delete apiData.category;
-    console.log("after deleting cat", apiData);
     try {
-      await createGift(apiData);
-      toast.success(`${data.giftname} was successfully added to the database`);
+      await addInventory(data);
+      toast.success(
+        `${data.product_id} was successfully added to the database`
+      );
       reset();
       refetchProducts();
     } catch (error) {
@@ -205,137 +133,63 @@ const AddInventoryForm = () => {
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <label className="block text-gray-700">Gift Name</label>
-          <input
-            type="text"
-            {...register("giftname")}
-            className="w-full p-2 border rounded"
-          />
-          {errors.giftname && (
-            <p className="text-red-500">{errors.giftname.message}</p>
-          )}
-        </div>
-        <div>
-          <label className="block text-gray-700">Craftman ID</label>
+          <label className="block text-gray-700">Quantity</label>
           <input
             type="number"
-            {...register("craftman_id", {
+            {...register("quantity", {
               setValueAs: (value) => parseFloat(value),
             })}
             className="w-full p-2 border rounded"
           />
-          {errors.craftman_id && (
-            <p className="text-red-500">{errors.craftman_id.message}</p>
+          {errors.quantity && (
+            <p className="text-red-500">{errors.quantity.message}</p>
           )}
         </div>
-
         <div>
-          <label className="block text-gray-700">Description</label>
-          <input
-            type="text"
-            {...register("description")}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700">Price</label>
+          <label className="block text-gray-700">Reserved</label>
           <input
             type="number"
-            step="0.01"
-            {...register("price", {
+            {...register("reserved", {
               setValueAs: (value) => parseFloat(value),
             })}
             className="w-full p-2 border rounded"
           />
-          {errors.price && (
-            <p className="text-red-500">{errors.price.message}</p>
+          {errors.reserved && (
+            <p className="text-red-500">{errors.reserved.message}</p>
           )}
         </div>
-        <div>
-          <label className="block text-charcoal">Category</label>
-          <select
-            {...register("category")}
-            className="w-full p-2 border rounded"
-            onChange={(e) => {
-              // For multiple selections, you would use something like:
-              // const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-              // console.log(selected);
-              // But for single selection, it's just:
-              console.log(e.target.value); // Log the selected category value
-              // Other handling code here...
-            }}
-          >
-            <option value="">Select a category</option>
-            {categories.map((category) => (
-              <option key={category.category_id} value={category.category_name}>
-                {category.category_name}
-              </option>
-            ))}
-          </select>
-
-          {/* Handle potential errors for categoryIds here */}
-        </div>
 
         <div>
-          <label className="block text-gray-700">URL</label>
+          <label className="block text-gray-700">Minimum</label>
           <input
-            type="text"
-            {...register("url")}
+            type="number"
+            {...register("minimum_level", {
+              setValueAs: (value) => parseFloat(value),
+            })}
             className="w-full p-2 border rounded"
           />
+          {errors.minimum_level && (
+            <p className="text-red-500">{errors.minimum_level.message}</p>
+          )}
         </div>
-
         <div>
-          <label className="block text-gray-700">SKU</label>
+          <label className="block text-gray-700">Last Update</label>
           <input
-            type="text"
-            {...register("sku")}
+            type="date"
+            {...register("last_updated", {
+              setValueAs: (value) => {
+                return value
+                  ? new Date(`${value}T00:00:00`).toISOString()
+                  : null;
+              },
+            })}
             className="w-full p-2 border rounded"
           />
-        </div>
-
-        <div>
-          <label className="block text-gray-700">Occasion</label>
-          {occasions.length > 0 ? (
-            occasions.map((occasion) => (
-              <Controller
-                control={control}
-                name="occasion"
-                key={occasion.id}
-                render={({ field }) => (
-                  <div key={occasion.id}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        value={occasion.name}
-                        onChange={(e) => {
-                          handleOccasionChange(e);
-                          if (e.target.checked) {
-                            field.onChange([...field.value, e.target.value]);
-                          } else {
-                            field.onChange(
-                              field.value.filter((v) => v !== e.target.value)
-                            );
-                          }
-                        }}
-                        checked={field.value.includes(occasion.name)}
-                      />
-                      {occasion.name}
-                    </label>
-                  </div>
-                )}
-              />
-            ))
-          ) : (
-            <p>Loading occasions...</p>
-          )}
-          {errors.occasion && (
-            <p className="text-red-500">{errors.occasion.message}</p>
+          {errors.last_updated && (
+            <p className="text-red-500">{errors.last_updated.message}</p>
           )}
         </div>
-
-        <div>
+        <div className="mt-2">
           <button
             type="submit"
             className="bg-charcoal text-white p-2 rounded hover:scale-95"

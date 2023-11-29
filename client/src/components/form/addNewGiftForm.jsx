@@ -182,7 +182,7 @@ const AddNewGiftForm = () => {
       ...data,
       category_id: category_id,
       occasionIds,
-      main_image: MainImage,
+      main_image: MainImage || "nothinh", //TODO: solve he problem of images empty
     };
 
     console.log("before deleting cat", apiData);
@@ -195,7 +195,7 @@ const AddNewGiftForm = () => {
       toast.success(`${data.giftname} was successfully added to the database`);
       reset();
       refetchProducts();
-      router.push("/admin/addgift/inventory_info");
+      // router.push(`/admin/addgift/inventory_info/${giftId}`);
     } catch (error) {
       console.error("API Error:", error);
     }

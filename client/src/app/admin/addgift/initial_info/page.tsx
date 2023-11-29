@@ -1,8 +1,8 @@
 import React from "react";
 import AddNewGiftForm from "../../../../components/form/addNewGiftForm";
 
-function AddGift() {
+function InitialInfo() {
   return <AddNewGiftForm />;
 }
 
-export default AddGift;
+export default InitialInfo;

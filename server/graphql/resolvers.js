@@ -298,8 +298,8 @@ const resolvers = {
         await prisma.$disconnect();
       }
     },
-    addToOrder: async (_, { addToOrder }) => {
-      const { order_id, product_id, quantity } = addToOrder;
+    addToOrder: async (_, { addToOrderInput }) => {
+      const { order_id, product_id, quantity } = addToOrderInput;
 
       try {
         // Check if the specified order exists
@@ -354,6 +354,25 @@ const resolvers = {
       } catch (error) {
         console.error("Error in addToOrder resolver:", error);
         throw new Error("Failed to add item to order");
+      }
+    },
+
+    addInventory: async (_, { addInventoryInput }) => {
+      // const { product_id, ...mainInventorydetail } = addInventoryInput;
+      // console.log("addInventoryResolver:", addInventoryInput);
+      try {
+        const productToInventory = await prisma.inventory.create({
+          data: addInventoryInput,
+        });
+
+        if (!productToInventory) {
+          throw new Error("Failed to add inventory.");
+        }
+
+        return productToInventory;
+      } catch (error) {
+        console.error(error);
+        throw new Error("Error adding inventory.");
       }
     },
   },

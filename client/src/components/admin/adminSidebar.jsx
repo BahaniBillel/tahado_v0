@@ -42,50 +42,12 @@ const Sidebar = () => {
      min-h-screen h-full bg-charcoal relative" // Add relative positioning
     >
       <h1 className="text-xl font-bold mb-4">Your Sidebar Title</h1>
-
-      {/* Users link with dropdown */}
-      <div
-        className="relative my-2"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+      <Link
+        className="bg-turquoise text-charcoal px-4 py-2  mb-2"
+        href={"/admin/addgift/initial_info"}
       >
-        <a
-          className="bg-turquoise  text-charcoal px-4 py-2 
-        mb-2 cursor-pointer "
-        >
-          Add new gift
-        </a>
-        <CSSTransition
-          in={isUsersDropdownOpen}
-          timeout={300}
-          classNames="dropdown"
-          unmountOnExit
-        >
-          <div
-            className="absolute left-0 mt-2  
-            text-charcoal p-2 rounded flex flex-col space-y-2 "
-            ref={dropdownRef}
-            onMouseEnter={handleDropdownMouseEnter}
-            onMouseLeave={handleDropdownMouseLeave}
-          >
-            {/* Add your sublinks here */}
-            <Link
-              href={"/admin/addgift/initial_info"}
-              className="py-1 px-4 bg-white"
-            >
-              Initial Informations
-            </Link>
-            <Link
-              href={"/admin/addgift/inventory_info"}
-              className="py-1 px-4 bg-white"
-            >
-              Inventory Informations
-            </Link>
-            {/* Add more sublinks as needed */}
-          </div>
-        </CSSTransition>
-      </div>
-
+        Add new gift
+      </Link>
       <Link
         className="bg-turquoise  text-charcoal px-4 py-2 mb-2"
         href={"/admin/resetredux"}

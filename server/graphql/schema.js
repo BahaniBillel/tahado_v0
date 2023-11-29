@@ -106,8 +106,18 @@ const typeDefs = `#graphql
   createWishItem(wishData:WishInput!):WishlistProductResponse!
   removeFromWishList(wishlistRemoveData: WishlistRemoveInput!): WishlistItem!
   createUser(userDataInput:UserDataInput!):User!
-   addToOrder(addToOrder: AddOrderItemInput!): AddOrderItemResponse!
+   addToOrder(addToOrderInput: AddOrderItemInput!): AddOrderItemResponse!
+addInventory(addInventoryInput:AddInventoryInput!):Inventory!
+}
 
+
+input AddInventoryInput{
+  product_id:Int
+  quantity: Int
+  reserved: Int
+  minimum_level: Int
+  last_updated: String
+  
 }
 input AddOrderItemInput {
   order_id: Int!
@@ -211,7 +221,20 @@ input CraftmanInput {
     wishlistitems: [WishlistItem!]!
     occasions: [ProductOccasion!]!
     craftman: Craftman
+    inventory:Inventory
   }
+
+ type Inventory {
+  inventory_id: ID!
+  product_id: Int
+  quantity: Int
+  reserved: Int
+  available: Int
+  minimum_level: Int
+  last_updated: String
+  product: Product
+}
+
 
   type Occasion {
     id: ID!
