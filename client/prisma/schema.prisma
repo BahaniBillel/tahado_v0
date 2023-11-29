@@ -121,7 +121,7 @@ model products {
   description     String?
   price           Decimal           @db.Decimal(10, 2)
   url             String?           @db.VarChar
-  Main_Image      String?           @db.VarChar
+  main_image      String?           @db.VarChar
   productCategory ProductCategory[]
   orderitems      orderitems[]
   productreviews  productreviews[]

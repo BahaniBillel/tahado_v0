@@ -22,10 +22,16 @@ export default async function Wishlist() {
   const { data: getwishlistbyuserid } = await client.query({
     query: GET_WISHLIST_BY_USERID,
     variables: { userId },
+    fetchPolicy: "network-only",
+    context: {
+      fetchOptions: {
+        next: { revalidate: 1 },
+      },
+    },
   });
 
   // Log the wishlist data in the console
-  // console.log("Wishlist data:", getwishlistbyuserid.wishlistByUser);
+  console.log("Wishlist data:", getwishlistbyuserid);
 
   //  Bring the wishlist product by user_id
   return (

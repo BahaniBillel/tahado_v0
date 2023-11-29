@@ -17,7 +17,6 @@ import { GraphQLClient } from "graphql-request";
 
 import { useEffect, useState } from "react";
 import fetchImagesFromS3 from "../../utils/fetchImagesFromS3";
-import { useRouter } from "next/navigation";
 
 const productSchema = z.object({
   giftname: z.string().max(100),
@@ -30,8 +29,7 @@ const productSchema = z.object({
   sku: z.string().max(100),
 });
 
-const AddNewGiftForm = () => {
-  const router = useRouter();
+const AddInventoryForm = () => {
   const {
     data: categoryData,
     loading: categoryLoading,
@@ -195,7 +193,6 @@ const AddNewGiftForm = () => {
       toast.success(`${data.giftname} was successfully added to the database`);
       reset();
       refetchProducts();
-      router.push("/admin/addgift/inventory_info");
     } catch (error) {
       console.error("API Error:", error);
     }
@@ -204,7 +201,7 @@ const AddNewGiftForm = () => {
   return (
     <div className="max-w-lg w-full  mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl text-charcoal font-bold mb-1">
-        First Page: Initial Gift Informations :
+        Second Page : Inventory Informations :
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
@@ -352,4 +349,4 @@ const AddNewGiftForm = () => {
   );
 };
 
-export default AddNewGiftForm;
+export default AddInventoryForm;

@@ -113,6 +113,7 @@ input AddOrderItemInput {
   order_id: Int!
   product_id: Int!
   quantity: Int!
+  
 }
 
 type AddOrderItemResponse {
@@ -203,7 +204,7 @@ input CraftmanInput {
     description: String
     price: Float!
     url: String
-    main_image: String!
+    main_image: String
     productCategory: [ProductCategory!]!
     orderitems: [OrderItem!]!
     productreviews: [ProductReview!]!

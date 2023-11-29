@@ -148,7 +148,7 @@ const resolvers = {
               description: giftData.description,
               price: giftData.price,
               url: giftData.url,
-              Main_Image: giftData.main_image,
+              main_image: giftData.main_image,
             },
           });
 

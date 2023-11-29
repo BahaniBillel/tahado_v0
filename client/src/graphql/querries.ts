@@ -73,6 +73,7 @@ export const GET_WISHLIST_BY_USERID = gql`
         last_name
       }
       wishlist_id
+
       wishlistitems {
         product_id
         product {
@@ -85,6 +86,7 @@ export const GET_WISHLIST_BY_USERID = gql`
           price
           description
           sku
+          main_image
         }
       }
     }
