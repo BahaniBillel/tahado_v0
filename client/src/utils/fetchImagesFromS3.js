@@ -9,9 +9,15 @@ const fetchImagesFromS3 = async (giftId) => {
     },
   });
 
+  // Adjust the Prefix based on whether giftId is provided
+  let prefix = "gifts_photos/";
+  if (giftId) {
+    prefix += `gift_${giftId}/`;
+  }
+
   const params = {
     Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-    Prefix: `gifts_photos/gift_${giftId}/`,
+    Prefix: prefix,
   };
 
   const command = new ListObjectsCommand(params);

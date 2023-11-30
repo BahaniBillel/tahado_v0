@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
+
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,8 +16,6 @@ import {
 import { GraphQLClient } from "graphql-request";
 
 // AWS S3 IMPORTS
-
-import { useEffect, useState } from "react";
 
 const InventorySchema = z.object({
   quantity: z.number().min(0).max(1000).nonnegative(),
@@ -36,6 +35,7 @@ const InventorySchema = z.object({
 
 const AddInventoryForm = () => {
   // Page parameter
+  const router = useRouter();
   const params = useParams();
   // const gid = router.query.gid;
 
@@ -49,7 +49,7 @@ const AddInventoryForm = () => {
     refetch: refetchProducts,
   } = useQuery(GET_PRODUCTS);
 
-  console.log(productsData);
+  console.log("logging from line 52 add ", productsData);
 
   //.......................... LOGIC FOR FETCHING IMAGES FROM AWS S3
   // FETCHING IMAGES FROM AMAEZON S3
@@ -94,6 +94,7 @@ product_id
     reserved
   }
 }`;
+    console.log(addInventoryInput);
 
     try {
       // Modify the inventoryData to sent
@@ -107,6 +108,7 @@ product_id
       });
       // console.log("Gift created successfully:", data.createGift);
       toast.success("Gift created successfully");
+      return data;
     } catch (error) {
       console.error("Error creating gift:", error);
       toast.error("Something went wrong while creating the gift");
@@ -121,6 +123,10 @@ product_id
       );
       reset();
       refetchProducts();
+
+      setTimeout(() => {
+        router.push(`/admin/addgift/initial_info`);
+      }, 3000);
     } catch (error) {
       console.error("API Error:", error);
     }
@@ -129,7 +135,8 @@ product_id
   return (
     <div className="max-w-lg w-full  mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl text-charcoal font-bold mb-1">
-        Second Page : Inventory Informations :
+        <span className="text-coralPink">Second Page : </span>
+        Inventory Informations :
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
@@ -146,7 +153,12 @@ product_id
           )}
         </div>
         <div>
-          <label className="block text-gray-700">Reserved</label>
+          <label className="block text-gray-700">
+            Reserved
+            <span className="text-red text-xs">
+              (needs to be filled by orders quantity){" "}
+            </span>
+          </label>
           <input
             type="number"
             {...register("reserved", {

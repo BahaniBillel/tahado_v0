@@ -50,13 +50,13 @@ function DynamicPageSkelton({ data, giftId }) {
 
   const { giftname, price, description, gift_id } = data;
   const formSchema = z.object({
-    giftname: z.string(),
+    giftname: z.string(), // add to order table
     price: z.number(),
     description: z.string(),
     gift_id: z.number(),
     quantity: z.number().min(1, "Quantity must be at least 1"),
-    date: z.string().min(1, "Date is required"),
-    expression: z.string().optional(),
+    date: z.string().min(1, "Date is required"), // add to order table
+    expression: z.string().optional(), // add to oder table
   });
 
   const {

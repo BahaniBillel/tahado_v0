@@ -106,19 +106,12 @@ const typeDefs = `#graphql
   createWishItem(wishData:WishInput!):WishlistProductResponse!
   removeFromWishList(wishlistRemoveData: WishlistRemoveInput!): WishlistItem!
   createUser(userDataInput:UserDataInput!):User!
-   addToOrder(addToOrderInput: AddOrderItemInput!): AddOrderItemResponse!
 addInventory(addInventoryInput:AddInventoryInput!):Inventory!
+   addToOrder(addToOrderInput: AddOrderItemInput!): AddOrderItemResponse!
 }
 
 
-input AddInventoryInput{
-  product_id:Int
-  quantity: Int
-  reserved: Int
-  minimum_level: Int
-  last_updated: String
-  
-}
+
 input AddOrderItemInput {
   order_id: Int!
   product_id: Int!
@@ -131,7 +124,14 @@ type AddOrderItemResponse {
   orderItem: OrderItem
 }
 
-
+input AddInventoryInput{
+  product_id:Int
+  quantity: Int
+  reserved: Int
+  minimum_level: Int
+  last_updated: String
+  
+}
 input UserDataInput{
   email:String!
   password_hash:String!

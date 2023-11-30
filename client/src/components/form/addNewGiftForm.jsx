@@ -58,17 +58,29 @@ const AddNewGiftForm = () => {
   const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
   const [productsLength, setProductsLength] = useState(0);
   const [giftNum, setGiftNum] = useState(0);
+  const [images, setImages] = useState([]);
   // Fetching the length of the products from database
   const giftId = giftNum;
 
   useEffect(() => {
     if (productsData && productsData.products) {
       const ProductsLength = productsData.products.length;
-      setProductsLength(ProductsLength);
       setGiftNum(ProductsLength + 1);
+      setProductsLength(ProductsLength);
     }
   }, [productsData]); // Add productsData to the dependency array
+  // Fetch all images
 
+  useEffect(() => {
+    const AllImages = async () => {
+      const images = await fetchImagesFromS3();
+      setImages(images);
+    };
+
+    AllImages();
+  }, []);
+
+  // Fetch images relevant to giftId
   useEffect(() => {
     const loadImages = async () => {
       const images = await fetchImagesFromS3(giftId);
@@ -182,7 +194,7 @@ const AddNewGiftForm = () => {
       ...data,
       category_id: category_id,
       occasionIds,
-      main_image: MainImage || "nothinh", //TODO: solve he problem of images empty
+      main_image: MainImage || images[0], //TODO: temporary solution untill i get the aws s3 bucket filled with images
     };
 
     console.log("before deleting cat", apiData);
@@ -195,16 +207,21 @@ const AddNewGiftForm = () => {
       toast.success(`${data.giftname} was successfully added to the database`);
       reset();
       refetchProducts();
-      // router.push(`/admin/addgift/inventory_info/${giftId}`);
+
+      setTimeout(() => {
+        router.push(`/admin/addgift/inventory_info/${giftId}`);
+      }, 3000);
     } catch (error) {
       console.error("API Error:", error);
     }
   };
 
+  console.log("logging images fetched from aws s3 ", images);
   return (
     <div className="max-w-lg w-full  mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl text-charcoal font-bold mb-1">
-        First Page: Initial Gift Informations :
+        <span className="text-turquoise ">First Page : </span>
+        Initial Gift Informations :
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>

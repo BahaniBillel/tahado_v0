@@ -7,11 +7,8 @@ import SectionLayout02 from "../components/layouts/SectionLayout02";
 import TextGraphql from "../components/TextGraphql";
 import { getClient } from "../app/lib/client";
 import { GET_OCCASIONS, GET_PORODUCT_OCCASION } from "../graphql/querries";
-import CheckoutProduct from "../components/checkout/checkoutProduct";
 
 export default async function Home() {
-  // const gifts = await FetchGifts();
-
   const client = getClient();
   // Use the client instance to query data for occasions
   const { data: occasionsData } = await client.query({

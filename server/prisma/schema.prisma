@@ -7,15 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model orders {
-  order_id     Int          @id @default(autoincrement())
-  user_id      Int?
-  order_date   DateTime?    @db.Date
-  total_amount Decimal?     @db.Decimal(10, 0)
-  orderitems   orderitems[]
-  users        users?       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
-}
-
 model paymentmethods {
   payment_method_id Int       @id @default(autoincrement())
   user_id           Int?
@@ -101,6 +92,18 @@ model craftmen {
   craftman_id Int        @id @default(autoincrement())
   name        String     @db.VarChar(100)
   products    products[]
+}
+
+model orders {
+  order_id         Int          @id @default(autoincrement())
+  user_id          Int?
+  order_date       DateTime?    @db.Date
+  recipient        String?      @db.VarChar
+  gifter_message   String?      @db.VarChar
+  wished_gift_date DateTime     @default(now())
+  total_amount     Decimal?     @db.Decimal(10, 0)
+  orderitems       orderitems[]
+  users            users?       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model orderitems {
