@@ -7,6 +7,7 @@ import "keen-slider/keen-slider.min.css";
 // Components
 import ProductLy01 from "../productsLayouts/ProdcutLy01";
 import DefaultImage from "../../../public/images/defaultGiftImage.jpg";
+import FadeTransition from "./FadeTransition";
 
 // Helpers
 import { getImages, s3Client } from "../../helpers/s3Helpers";
@@ -25,6 +26,7 @@ const ProductsLine = ({
   const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
   const { userId } = useCustomSession();
   const [selectedOccasion, setSelectedOccasion] = useState(null);
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
     // console.log("useEffect triggered");
@@ -113,19 +115,26 @@ const ProductsLine = ({
               {filteredGiftsData.map((gift) => {
                 const giftImages = giftImageMap[gift.gift_id] || []; // Retrieve images for this gift
                 const mainImage = giftImages[0] || DefaultImage; // Use the first image or a default
+                const secondImage = giftImages[1] || DefaultImage; // Use the first image or a default
                 return (
-                  <div className="keen-slider__slide py-5 " key={gift.gift_id}>
-                    <ProductLy01
-                      giftName={gift.giftname}
-                      mainImage={mainImage} // Updated to use a mapped image
-                      price={gift.price}
-                      link={gift.url}
-                      user_id={userId}
-                      product_id={gift.gift_id}
-                      feature="New"
-                      featureColor="turquoise"
-                    />
-                  </div>
+                  <FadeTransition in={show}>
+                    <div
+                      className="keen-slider__slide py-5 "
+                      key={gift.gift_id}
+                    >
+                      <ProductLy01
+                        giftName={gift.giftname}
+                        mainImage={mainImage} // Updated to use a mapped image
+                        secondImage={secondImage}
+                        price={gift.price}
+                        link={gift.url}
+                        user_id={userId}
+                        product_id={gift.gift_id}
+                        feature="New"
+                        featureColor="turquoise"
+                      />
+                    </div>
+                  </FadeTransition>
                 );
               })}
             </div>

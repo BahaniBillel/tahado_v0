@@ -277,18 +277,24 @@ const resolvers = {
         });
 
         // Set the first user as admin, and the second and third as moderators
+        // if (user.user_id === 1) {
+        //   await prisma.users.update({
+        //     where: { user_id: user.user_id },
+        //     data: { roles: ["admin"] },
+        //   });
+        // } else if (user.user_id >= 2 && user.user_id <= 5) {
+        //   await prisma.users.update({
+        //     where: { user_id: user.user_id },
+        //     data: { roles: ["moderator"] },
+        //   });
+        // }
+
         if (user.user_id === 1) {
           await prisma.users.update({
             where: { user_id: user.user_id },
             data: { roles: ["admin"] },
           });
-        } else if (user.user_id >= 2 && user.user_id <= 5) {
-          await prisma.users.update({
-            where: { user_id: user.user_id },
-            data: { roles: ["moderator"] },
-          });
         }
-
         return user;
       } catch (error) {
         console.error("Prisma Error:", error);
@@ -300,75 +306,136 @@ const resolvers = {
     },
 
     addInventory: async (_, { addInventoryInput }) => {
-      // const { product_id, ...mainInventorydetail } = addInventoryInput;
       console.log("addInventoryResolver:", addInventoryInput);
       try {
-        const productToInventory = await prisma.inventory.create({
-          data: addInventoryInput,
+        // Check if an inventory record with this product_id already exists
+        const existingInventory = await prisma.inventory.findUnique({
+          where: { product_id: addInventoryInput.product_id },
         });
 
+        let productToInventory;
+
+        if (existingInventory) {
+          // Update the existing inventory record
+          productToInventory = await prisma.inventory.update({
+            where: { product_id: addInventoryInput.product_id },
+            data: addInventoryInput,
+          });
+        } else {
+          // Create a new inventory record
+          productToInventory = await prisma.inventory.create({
+            data: addInventoryInput,
+          });
+        }
+
         if (!productToInventory) {
-          throw new Error("Failed to add inventory.");
+          throw new Error("Failed to add or update inventory.");
         }
 
         return productToInventory;
       } catch (error) {
         console.error(error);
-        throw new Error("Error adding inventory.");
+        throw new Error("Error adding or updating inventory.");
       }
     },
+
     addToOrder: async (_, { addToOrderInput }) => {
-      const { order_id, product_id, quantity, subtotal } = addToOrderInput;
+      const {
+        user_id,
+        order_date,
+        product_id,
+        recipient,
+        gifter_message,
+        quantity,
+        wished_gift_date,
+        price,
+      } = addToOrderInput;
 
       try {
-        // Check if the specified order exists
-        const order = await prisma.orders.findUnique({
-          where: {
-            order_id: order_id,
-          },
-        });
-
-        if (!order) {
-          throw new Error(`Order with ID ${order_id} not found.`);
-        }
-
-        // Check if the product exists
-        const product = await prisma.products.findUnique({
+        // Check if the specified product exists
+        const existingProduct = await prisma.products.findUnique({
           where: {
             gift_id: product_id,
           },
         });
 
-        if (!product) {
+        if (!existingProduct) {
           throw new Error(`Product with ID ${product_id} not found.`);
         }
-
-        // Add the product to the order
-        const newOrderItem = await prisma.orderitems.create({
-          data: {
-            order_id: order_id,
+        // Check if the specified product exists in inventory table
+        const existingInventory = await prisma.inventory.findUnique({
+          where: {
             product_id: product_id,
-            quantity: quantity,
-            subtotal: product.price * quantity, // Assuming the price is stored in the product record
           },
         });
 
-        // Optionally update the total amount of the order
-        const updatedOrder = await prisma.orders.update({
+        if (!existingInventory) {
+          throw new Error(
+            `Product with ID ${product_id} not found in inventory table.`
+          );
+        }
+
+        if (existingInventory.quantity < quantity) {
+          throw new Error(`The quantity ordered is not available`);
+        }
+
+        // Add the product to the order
+        const newOrder = await prisma.orders.create({
+          data: {
+            user_id,
+            order_date,
+            total_amount: quantity * price,
+            recipient,
+            gifter_message,
+            wished_gift_date,
+          },
+        });
+
+        if (!newOrder) {
+          throw new Error("The new ordered was not added to orders table");
+        }
+
+        // Add newOrderItem
+        const newOrderItem = await prisma.orderitems.create({
+          data: {
+            order_id: newOrder.order_id,
+            product_id,
+            quantity,
+            subtotal: quantity * price,
+          },
+        });
+
+        // Retrieve all reserved orders for the product
+        const reservedOrders = await prisma.orderitems.groupBy({
           where: {
-            order_id: order_id,
+            product_id,
+            // Add any additional conditions to filter reserved orders
+          },
+          by: ["product_id"],
+          _sum: {
+            quantity: true,
+          },
+        });
+        const reservedQuantity = reservedOrders[0]?._sum.quantity || 0;
+
+        console.log(reservedQuantity);
+        // TODO: implment check for the availability of the product
+        // Update the inventory table
+        const UpdateInventory = await prisma.inventory.update({
+          where: {
+            product_id,
           },
           data: {
-            // Assuming total_amount is a sum of all order item subtotals
-            total_amount: {
-              increment: product.price * quantity,
-            },
+            available: existingInventory.quantity - reservedQuantity,
+            // Other fields as required
+            last_updated: new Date(),
           },
         });
 
         return {
-          order: updatedOrder,
+          order: newOrder,
           orderItem: newOrderItem,
+          inventory: UpdateInventory,
         };
       } catch (error) {
         console.error("Error in addToOrder resolver:", error);

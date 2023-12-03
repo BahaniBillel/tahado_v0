@@ -114,3 +114,22 @@ body {
 .thumbnail .keen-slider__slide.active {
   border: 2px solid #fdbfa6;
 }
+
+/* React Transition Group */
+/* Enter Animation */
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+/* Exit Animation */
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}

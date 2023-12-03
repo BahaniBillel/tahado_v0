@@ -120,27 +120,35 @@ function DynamicPageSkelton({ data, giftId }) {
           onSubmit={handleSubmit(onSubmit)}
         >
           <h2 className="text-2xl md:text-3xl font">{data.giftname}</h2>
-          <p className="para">{data.description}</p>
-          <div className=" border-y border-y-charcoal/20 py-2 bg-lightGray w-full flex flex-row items-center justify-end">
-            <ReactStarsComp />
-          </div>
           <div className="text-2xl flex flex-row flex-nowrap space-x-2">
             <span> د.ج</span>
             <p className="font-bold ">{data.price}</p>
           </div>
+          <p className="para">{data.description}</p>
+          <div className=" border-y border-y-charcoal/20 py-2 bg-lightGray w-full flex flex-row items-center justify-end">
+            <ReactStarsComp />
+          </div>
+
           <div className="font-light text-xs flex flex-row flex-nowrap space-x-2 items-center">
             <p>تم شراؤه أكثر من 14 مرة</p>
             <p>{data.url}</p>
             <MdLocalOffer className="text-charcoal" />
           </div>
 
-          <label id="expression" className="text-right whitespace-pre">
+          <label id="gifter_message">المتلقي</label>
+          <input
+            type="text"
+            name="gifter_message"
+            id="gifter_message"
+            className="input"
+          />
+          <label id="gifter_message" className="text-right whitespace-pre">
             : اكتب العبارة المراد كتابتها على البطاقة
           </label>
           <textarea
             type="text"
-            name="expression"
-            id="expression"
+            name="gifter_message"
+            id="gifter_message"
             className="input"
           />
           <label id="date" className="text-right whitespace-pre">

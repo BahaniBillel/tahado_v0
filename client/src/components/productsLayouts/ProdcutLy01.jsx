@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 import { HeartIcon } from "@heroicons/react/24/solid";
@@ -15,8 +15,12 @@ import { GET_WISHLIST } from "../../graphql/querries";
 import { useMutation, useQuery } from "@apollo/client";
 import { GraphQLClient, gql } from "graphql-request";
 
+// React Transition Group
+import { Transition } from "react-transition-group";
+
 function ProductLy01({
   mainImage,
+  secondImage,
   giftName,
   price,
   feature,
@@ -31,6 +35,22 @@ function ProductLy01({
 }) {
   const dispatch = useDispatch();
   const [heart, setHeart] = useState(false);
+
+  // Hover
+
+  useEffect(() => {
+    setCurrentImage(mainImage);
+  }, [mainImage]);
+
+  const [currentImage, setCurrentImage] = useState(mainImage);
+
+  const handleMouseEnter = () => {
+    setCurrentImage(secondImage);
+  };
+
+  const handleMouseLeave = () => {
+    setCurrentImage(mainImage);
+  };
 
   // GraphQL Query to get wishlist data
 
@@ -148,7 +168,11 @@ function ProductLy01({
   };
 
   return (
-    <div className="w-80 group">
+    <div
+      className={`w-80 group `}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div
         className={` ${"w-50" || width}  ${
           "h-80" || length
@@ -165,7 +189,7 @@ function ProductLy01({
         <Link href={`/gift/${link}`}>
           <div className="h-full overflow-hidden">
             <Image
-              src={mainImage}
+              src={currentImage || mainImage}
               alt={giftName}
               fill={fill}
               width={300}

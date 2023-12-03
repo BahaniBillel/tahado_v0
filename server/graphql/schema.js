@@ -113,10 +113,15 @@ addInventory(addInventoryInput:AddInventoryInput!):Inventory!
 
 
 input AddOrderItemInput {
-  order_id: Int!
+  user_id: Int!
+  order_date:String 
   product_id: Int!
+  recipient:String   
+  gifter_message:String
   quantity: Int!
-  
+  wished_gift_date: String  
+    price: Float! 
+    
 }
 
 type AddOrderItemResponse {
@@ -190,7 +195,10 @@ input CraftmanInput {
    type Order {
     order_id: ID!
     user_id: Int
-    order_date: String
+    order_date:String
+    recipient:String    
+    gifter_message:String     
+    wished_gift_date: String    
     total_amount: Float
     orderitems: [OrderItem!]!
     user: User

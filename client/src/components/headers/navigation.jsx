@@ -86,7 +86,7 @@ function Navigation({ url }) {
               <Link href="/client">Client</Link>
             </li>
             <li>
-              <Link href="/extra">{isUserSignIn ? isUserSignIn : null}</Link>
+              <Link href="/admin">{isUserSignIn ? isUserSignIn : null}</Link>
             </li>
           </ul>
         </nav>
