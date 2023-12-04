@@ -5,6 +5,27 @@ const bcrypt = require("bcrypt");
 const resolvers = {
   Query: {
     orders: () => prisma.orders.findMany(),
+
+    order: async (_, { user_id }) => {
+      try {
+        const orders = await prisma.orders.findMany({
+          where: {
+            user_id: parseInt(user_id),
+          },
+        });
+
+        // Check if orders array contains any order with null order_id
+        if (orders.some((order) => order.order_id == null)) {
+          // Handle this scenario appropriately
+        }
+
+        return orders;
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        throw new Error("Error fetching orders. See console logs for details.");
+      }
+    },
+
     paymentmethods: () => prisma.paymentmethods.findMany(),
     productreviews: () => prisma.productreviews.findMany(),
     shippingaddresses: () => prisma.shippingaddresses.findMany(),
@@ -342,14 +363,16 @@ const resolvers = {
     addToOrder: async (_, { addToOrderInput }) => {
       const {
         user_id,
-        order_date,
+
         product_id,
         recipient,
         gifter_message,
         quantity,
-        wished_gift_date,
+
         price,
       } = addToOrderInput;
+
+      console.log(addToOrderInput);
 
       try {
         // Check if the specified product exists
@@ -379,15 +402,29 @@ const resolvers = {
           throw new Error(`The quantity ordered is not available`);
         }
 
+        const existingOrder = await prisma.orders.findFirst({
+          where: {
+            user_id,
+            total_amount: quantity * price,
+            recipient,
+            gifter_message,
+          },
+        });
+
+        if (existingOrder) {
+          throw new Error(
+            `This Order with reference ${existingOrder.order_id} already exists`
+          );
+        }
+
         // Add the product to the order
         const newOrder = await prisma.orders.create({
           data: {
             user_id,
-            order_date,
+            order_date: new Date(),
             total_amount: quantity * price,
             recipient,
             gifter_message,
-            wished_gift_date,
           },
         });
 
@@ -421,13 +458,17 @@ const resolvers = {
         console.log(reservedQuantity);
         // TODO: implment check for the availability of the product
         // Update the inventory table
+
+        if (reservedQuantity >= existingInventory.available) {
+          throw new Error("Insufficient stock available for the product.");
+        }
         const UpdateInventory = await prisma.inventory.update({
           where: {
             product_id,
           },
           data: {
+            reserved: reservedQuantity,
             available: existingInventory.quantity - reservedQuantity,
-            // Other fields as required
             last_updated: new Date(),
           },
         });

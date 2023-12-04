@@ -120,3 +120,18 @@ export const GET_PRODUCTS = gql`
     }
   }
 `;
+
+export const GET_ORDERS_BY_USER_ID = gql`
+  query GetOrdersByUserId($userId: ID!) {
+    order(user_id: $userId) {
+      order_id
+      user_id
+      total_amount
+      orderitems {
+        item_id
+        product_id
+        quantity
+      }
+    }
+  }
+`;

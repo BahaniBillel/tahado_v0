@@ -1,6 +1,7 @@
 const typeDefs = `#graphql
   type Query {
     orders: [Order!]!
+    order(user_id: ID!): [Order]
     paymentmethods: [PaymentMethod!]!
     productreviews: [ProductReview!]!
     shippingaddresses: [ShippingAddress!]!
@@ -114,13 +115,13 @@ addInventory(addInventoryInput:AddInventoryInput!):Inventory!
 
 input AddOrderItemInput {
   user_id: Int!
-  order_date:String 
+ 
   product_id: Int!
   recipient:String   
   gifter_message:String
   quantity: Int!
-  wished_gift_date: String  
-    price: Float! 
+
+  price: Float! 
     
 }
 

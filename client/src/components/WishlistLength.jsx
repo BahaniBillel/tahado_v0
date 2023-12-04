@@ -6,7 +6,9 @@ import { useMutation, useQuery } from "@apollo/client";
 import { GET_WISHLIST } from "../graphql/querries";
 
 function WishlistLength({ userId }) {
-  const { data, loading, error } = useQuery(GET_WISHLIST);
+  const { data, loading, error } = useQuery(GET_WISHLIST, {
+    pollInterval: 100,
+  });
 
   if (loading)
     return (

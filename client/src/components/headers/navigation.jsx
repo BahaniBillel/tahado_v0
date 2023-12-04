@@ -16,6 +16,7 @@ import { getSession, useSession } from "next-auth/react";
 import UserSignOutButton from "../UserSignOutButton";
 import UserSignInButton from "../UserSignInButton";
 import WishlistLength from "../WishlistLength";
+import BasketLength from "../BasketLength";
 
 function Navigation({ url }) {
   const items = useSelector(selectItems);
@@ -51,7 +52,8 @@ function Navigation({ url }) {
           <li className="midLink relative">
             <IoIosBasket className="text-black h-10 cursor-pointer " />
             <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-              {items ? items.length : 0}
+              {/* {items ? items.length : 0} */}
+              <BasketLength userId={userID} />
             </span>
           </li>
         </ul>

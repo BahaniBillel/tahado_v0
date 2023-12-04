@@ -9,7 +9,9 @@ import fetchImagesFromS3 from "../utils/fetchImagesFromS3";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { request, gql } from "graphql-request";
+import { request, gql, GraphQLClient } from "graphql-request";
+
+import { getSession, useSession } from "next-auth/react";
 
 import {
   BiLogoInstagramAlt,
@@ -19,6 +21,7 @@ import {
 } from "react-icons/bi";
 
 import NextJsCarousel from "../utils/ResponsiveCarousel";
+import { toast } from "sonner";
 
 function DynamicPageSkelton({ data, giftId }) {
   // FETCHING IMAGES FROM AMAEZON S3
@@ -42,21 +45,23 @@ function DynamicPageSkelton({ data, giftId }) {
 
   // Form Submission setup
 
-  // TODO: see the logic
-  //  the gift data is already present in data, so we need to integrate  quantity and
-  // date and expression into data and descrese the from invontory table and decrease
-  // it from order table and the related tables also, then submit the mix
-  console.log("logging from gift product", data);
+  // TODO: Logic for sending data to addToOrder Resolver
 
-  const { giftname, price, description, gift_id } = data;
+  // Get the user's session.
+  const { data: userData, status } = useSession();
+  const isUserSignIn = userData?.user?.first_name;
+  const user_id = parseInt(userData?.user?.user_id);
+
+  console.log(isUserSignIn, user_id);
+  // console.log("logging from gift product", data);
+
   const formSchema = z.object({
-    giftname: z.string(), // add to order table
-    price: z.number(),
-    description: z.string(),
-    gift_id: z.number(),
+    recipient: z
+      .string()
+      .min(1, "Recipient is required")
+      .max(100, "Recipient name too long"),
+    gifter_message: z.string().max(500, "Message is too long").optional(),
     quantity: z.number().min(1, "Quantity must be at least 1"),
-    date: z.string().min(1, "Date is required"), // add to order table
-    expression: z.string().optional(), // add to oder table
   });
 
   const {
@@ -64,45 +69,67 @@ function DynamicPageSkelton({ data, giftId }) {
     handleSubmit,
     formState: { errors },
     control,
+    reset,
   } = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      giftname: data.giftname,
-      price: data.price,
-      description: data.description,
-      gift_id: data.gift_id,
-      // Set default values for other fields if necessary
-    },
+    defaultValues: {},
   });
 
-  const addToOrder = async (addToOrder) => {
+  const addToOrder = async (addToOrderInput) => {
     const client = new GraphQLClient("http://localhost:3001/graphql");
+    const mutation = `
+      mutation AddToOrder($addToOrderInput: AddOrderItemInput!) {
+        addToOrder(addToOrderInput: $addToOrderInput) {
+          order {
+            user_id
+            order_date
+            recipient
+            gifter_message
+            wished_gift_date
+          }
+          orderItem {
+            product_id
+            quantity
+            product {
+              price
+            }
+          }
+        }
+      }
+    `;
 
-    const mutation = `mutation CreateGift($giftData: GiftInput!) {
-  createGift(giftData: $giftData) {
-    craftman_id
-    sku
-    giftname
-    description
-    price
-    url
-    occasions {
-      occasion {
-        id
-      }
+    try {
+      const response = await client.request(
+        mutation,
+
+        {
+          addToOrderInput: addToOrderInput,
+        }
+      );
+      console.log("Order Response:", response);
+    } catch (error) {
+      console.error("Order Submission Error:", error);
     }
-    productCategory {
-      category {
-        category_id
-      }
-    }
-  }
-}`;
   };
-  const onSubmit = (formData) => {
-    console.log(formData);
-    // Submit formData to your backend
+
+  const onSubmit = async (formData) => {
+    console.log("Form Data:", formData);
+    console.log(parseInt(formData.quantity));
+    const addToOrderInput = {
+      user_id: user_id,
+      product_id: parseInt(data.gift_id),
+      recipient: formData.recipient,
+      gifter_message: formData.gifter_message,
+      quantity: parseInt(formData.quantity),
+      price: data.price,
+    };
+
+    await addToOrder(addToOrderInput);
+    toast.success(`${data.giftname} was added to basket`);
+    reset();
   };
+
+  console.log(errors);
 
   return (
     <div>
@@ -125,7 +152,10 @@ function DynamicPageSkelton({ data, giftId }) {
             <p className="font-bold ">{data.price}</p>
           </div>
           <p className="para">{data.description}</p>
-          <div className=" border-y border-y-charcoal/20 py-2 bg-lightGray w-full flex flex-row items-center justify-end">
+          <div
+            className=" border-y border-y-charcoal/20 py-2
+           bg-lightGray w-full flex flex-row items-center justify-end"
+          >
             <ReactStarsComp />
           </div>
 
@@ -135,41 +165,41 @@ function DynamicPageSkelton({ data, giftId }) {
             <MdLocalOffer className="text-charcoal" />
           </div>
 
-          <label id="gifter_message">المتلقي</label>
+          <label id="recipient">المتلقي</label>
           <input
+            {...register("recipient")}
             type="text"
-            name="gifter_message"
-            id="gifter_message"
+            name="recipient"
+            id="recipient"
             className="input"
           />
           <label id="gifter_message" className="text-right whitespace-pre">
             : اكتب العبارة المراد كتابتها على البطاقة
           </label>
           <textarea
+            {...register("gifter_message")}
             type="text"
             name="gifter_message"
             id="gifter_message"
             className="input"
           />
-          <label id="date" className="text-right whitespace-pre">
-            : يوم تسليم الهدية
-          </label>
-          <input
-            type="datetime-local"
-            name="date"
-            id="date"
-            className="input"
-          />
 
           <div className="flex flex-row space-x-3 w-full my-10 ">
-            <select name="quantity" id="" className="input">
+            <select
+              name="quantity"
+              id="quantity"
+              className="input"
+              {...register("quantity", {
+                setValueAs: (value) => parseFloat(value),
+              })}
+            >
               <option value="1">1</option>
-              <option value="1">2</option>
-              <option value="1">3</option>
-              <option value="1">4</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
             </select>
             <button
-              type="button"
+              type="submit"
               className="border px-6 py-1 rounded-sm text-sm font-light bg-charcoal
              text-turquoise hover:text-coralPinkLight hover:bg-charcoal hover:border-charcoal
              transition-all duration-150 ease-in-out whitespace-pre "

@@ -131,6 +131,8 @@ const AddNewGiftForm = () => {
       );
     }
   };
+
+  //GRAPHQL SETUP
   const createGift = async (giftData) => {
     const client = new GraphQLClient("http://localhost:3001/graphql");
 
