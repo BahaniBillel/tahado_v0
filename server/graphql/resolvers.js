@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const resolvers = {
   Query: {
-    orders: () => prisma.orders.findMany(),
+    // orders: () => prisma.orders.findMany(),
 
     order: async (_, { user_id }) => {
       try {
@@ -25,6 +25,16 @@ const resolvers = {
         throw new Error("Error fetching orders. See console logs for details.");
       }
     },
+    orders: () =>
+      prisma.orders.findMany({
+        include: {
+          orderitems: {
+            include: {
+              products: true,
+            },
+          },
+        },
+      }),
 
     paymentmethods: () => prisma.paymentmethods.findMany(),
     productreviews: () => prisma.productreviews.findMany(),
@@ -490,6 +500,7 @@ const resolvers = {
     orderitems: (parent) =>
       prisma.orderitems.findMany({ where: { order_id: parent.order_id } }),
   },
+
   PaymentMethod: {
     user: (parent) =>
       prisma.users.findUnique({ where: { user_id: parent.user_id } }),
@@ -550,6 +561,7 @@ const resolvers = {
   Product: {
     productCategory: (parent) =>
       prisma.productCategory.findMany({ where: { gift_id: parent.gift_id } }),
+
     orderitems: (parent) =>
       prisma.orderitems.findMany({ where: { product_id: parent.gift_id } }),
     productreviews: (parent) =>
