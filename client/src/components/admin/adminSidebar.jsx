@@ -41,42 +41,42 @@ const Sidebar = () => {
       className="bg-gray-800 text-white p-4 flex flex-col justify-start
      min-h-screen h-full bg-charcoal relative" // Add relative positioning
     >
-      <h1 className="text-xl font-bold mb-4">Your Sidebar Title</h1>
+      <h1 className="text-xl font-bold mb-4">Admin Panel</h1>
       <Link
-        className="bg-turquoise text-charcoal px-4 py-2  mb-2"
+        className="bg-turquoise text-charcoal px-4 py-2  mb-2 hover:bg-lightGray duration-150 ease-in-out"
         href={"/admin/addgift/initial_info"}
       >
         Add new gift
       </Link>
       <Link
-        className="bg-turquoise  text-charcoal px-4 py-2 mb-2"
+        className="bg-turquoise  text-charcoal px-4 py-2 mb-2 hover:bg-lightGray duration-150 ease-in-out"
         href={"/admin/resetredux"}
       >
         Reset redux store
       </Link>
       <Link
-        className="bg-turquoise  text-charcoal px-4 py-2  mb-2"
+        className="bg-turquoise  text-charcoal px-4 py-2  mb-2 hover:bg-lightGray duration-150 ease-in-out"
         href={"/admin/addcraftman"}
       >
         Add craftman
       </Link>
       <Link
-        className="bg-turquoise  text-charcoal px-4 py-2  mb-2"
+        className="bg-turquoise  text-charcoal px-4 py-2  mb-2 hover:bg-lightGray duration-150 ease-in-out"
         href={"/admin/addoccasion"}
       >
         Add new occasion
       </Link>
       <Link
-        className="bg-turquoise  text-charcoal px-4 py-2  mb-2"
+        className="bg-turquoise  text-charcoal px-4 py-2  mb-2 hover:bg-lightGray duration-150 ease-in-out"
         href={"/admin/addcategory"}
       >
         Add category
       </Link>
       <Link
-        className="bg-turquoise  text-charcoal px-4 py-2  mb-2"
-        href={"/admin/addorder"}
+        className="bg-turquoise  text-charcoal px-4 py-2  mb-2 hover:bg-lightGray duration-150 ease-in-out whitespace-pre"
+        href={"/admin/orders"}
       >
-        Add order
+        Orders Management
       </Link>
 
       {/* Users link with dropdown */}
@@ -87,7 +87,7 @@ const Sidebar = () => {
       >
         <a
           className="bg-turquoise  text-charcoal px-4 py-2 
-        mb-2 cursor-pointer "
+        mb-2 cursor-pointer  hover:bg-lightGray duration-150 ease-in-out"
         >
           users
         </a>

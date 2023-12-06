@@ -19,7 +19,7 @@ export default withAuth(
     // }
 
     if (
-      request.nextUrl.pathname.startsWith("/admin") &&
+      request.nextUrl.pathname.startsWith("/admin/") &&
       request.nextauth.token?.roles.indexOf("admin") === -1
     ) {
       return NextResponse.rewrite(new URL("/denied", request.url));
@@ -34,4 +34,7 @@ export default withAuth(
 
 // Applies next-auth only to matching routes - can be regex
 // Ref: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
-export const config = { matcher: ["/admin", "/dashboard"] };
+
+// Applies next-auth middleware to all sub-routes under "/admin" and "/dashboard"
+export const config = { matcher: ["/admin/:path*", "/dashboard/:path*"] };
+

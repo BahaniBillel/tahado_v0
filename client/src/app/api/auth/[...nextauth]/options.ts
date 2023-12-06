@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import db from "../../../../db/prismaDB";
 import { compare } from "bcrypt";
+import { error } from "console";
 
 export const options: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -28,6 +29,7 @@ export const options: NextAuthOptions = {
           label: "email",
           type: "text",
           placeholder: "your email",
+          // http://localhost:3000/api/auth/providers/callback/google
         },
         password: {
           label: "Password:",

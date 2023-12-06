@@ -135,3 +135,28 @@ export const GET_ORDERS_BY_USER_ID = gql`
     }
   }
 `;
+
+export const GET_ALL_ORDERS=gql`
+
+query AllOrders {
+  orders {
+    order_id
+    orderitems {
+      product {
+        giftname
+      }
+      quantity
+    }
+    user_id
+    user {
+      first_name
+      last_name
+      email
+    }
+    order_date
+    gifter_message
+    recipient
+    total_amount
+    wished_gift_date
+  }
+}`

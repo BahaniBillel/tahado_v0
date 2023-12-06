@@ -25,17 +25,19 @@ const resolvers = {
         throw new Error("Error fetching orders. See console logs for details.");
       }
     },
+
     orders: () =>
       prisma.orders.findMany({
         include: {
-          orderitems: {
-            include: {
-              products: true,
-            },
-          },
+          orderitems: true,
         },
       }),
-
+    orderitems: () =>
+      prisma.orderitems.findMany({
+        include: {
+          products: true,
+        },
+      }),
     paymentmethods: () => prisma.paymentmethods.findMany(),
     productreviews: () => prisma.productreviews.findMany(),
     shippingaddresses: () => prisma.shippingaddresses.findMany(),
@@ -64,7 +66,14 @@ const resolvers = {
     wishlist: () => prisma.wishlist.findMany(),
     wishlistitems: () => prisma.wishlistitems.findMany(),
     categories: () => prisma.categories.findMany(),
-    products: () => prisma.products.findMany(),
+    products: () =>
+      prisma.products.findMany({
+        include: {
+          inventory: true, // Include inventory data
+          orderitems: true,
+        },
+      }),
+    inventory: () => prisma.inventory.findMany(),
     occasions: () => prisma.occasion.findMany(),
     productOccasion: async (_, { productId }) => {
       return await prisma.productOccasion.findMany({
@@ -500,7 +509,16 @@ const resolvers = {
     orderitems: (parent) =>
       prisma.orderitems.findMany({ where: { order_id: parent.order_id } }),
   },
-
+  OrderItem: {
+    product: (parent) =>
+      prisma.products.findUnique({ where: { gift_id: parent.product_id } }),
+    order: (parent) =>
+      prisma.order.findMany({
+        where: {
+          order_id: parent.order_id,
+        },
+      }),
+  },
   PaymentMethod: {
     user: (parent) =>
       prisma.users.findUnique({ where: { user_id: parent.user_id } }),

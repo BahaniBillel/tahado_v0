@@ -2,6 +2,7 @@ const typeDefs = `#graphql
   type Query {
     orders: [Order!]!
     order(user_id: ID!): [Order]
+    orderitems:[OrderItem!]!
     paymentmethods: [PaymentMethod!]!
     productreviews: [ProductReview!]!
     shippingaddresses: [ShippingAddress!]!
@@ -11,6 +12,7 @@ const typeDefs = `#graphql
     wishlistitems: [WishlistItem!]!
     categories: [Category!]!
     products: [Product!]!
+    inventory:[Inventory!]!
     occasions: [Occasion!]!
     productOccasion(productId: Int!): [ProductOccasion!]!
     wishlistByUser(userId: Int!): [Wishlist!]!
@@ -219,7 +221,7 @@ input CraftmanInput {
     gift_id: ID!
     craftman_id: Int
     sku: String!
-    giftname: String!
+    giftname: String
     description: String
     price: Float!
     url: String
