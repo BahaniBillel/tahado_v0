@@ -7,6 +7,7 @@ import SectionLayout02 from "../components/layouts/SectionLayout02";
 import TextGraphql from "../components/TextGraphql";
 import { getClient } from "../app/lib/client";
 import { GET_OCCASIONS, GET_PORODUCT_OCCASION } from "../graphql/querries";
+import MiddleHeader from "../components/headers/middleHeader";
 
 export default async function Home() {
   const client = getClient();
@@ -41,8 +42,7 @@ export default async function Home() {
   console.log(productOccasionData.products.length);
   return (
     <main className="">
-      <TextGraphql />
-      {productOccasionData.products.length}
+      <MiddleHeader />
       <ProductsLine
         giftsData={productOccasionData.products}
         lineID={1}

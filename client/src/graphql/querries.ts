@@ -136,27 +136,55 @@ export const GET_ORDERS_BY_USER_ID = gql`
   }
 `;
 
-export const GET_ALL_ORDERS=gql`
-
-query AllOrders {
-  orders {
-    order_id
-    orderitems {
-      product {
-        giftname
+export const GET_ALL_ORDERS = gql`
+  query AllOrders {
+    orders {
+      order_id
+      orderitems {
+        product {
+          giftname
+        }
+        quantity
       }
-      quantity
+      user_id
+      user {
+        first_name
+        last_name
+        email
+      }
+      order_date
+      gifter_message
+      recipient
+      total_amount
+      wished_gift_date
     }
-    user_id
-    user {
-      first_name
-      last_name
-      email
-    }
-    order_date
-    gifter_message
-    recipient
-    total_amount
-    wished_gift_date
   }
-}`
+`;
+
+export const GET_SEARCH_PRODUCTS = gql`
+  query GetSearchProduct {
+    products {
+      giftname
+      description
+      url
+      craftman {
+        name
+      }
+      main_image
+      occasions {
+        occasion {
+          name
+        }
+      }
+      price
+      productCategory {
+        category {
+          category_name
+        }
+      }
+      productreviews {
+        rating
+      }
+    }
+  }
+`;

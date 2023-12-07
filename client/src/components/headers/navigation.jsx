@@ -74,7 +74,7 @@ function Navigation({ url }) {
         {/* <Reset /> */}
         {/* <p className="text-gray-800 tracking-wide ">تهادو تحابو</p> */}
         <nav className="bg-blue-800 p-4 ">
-          <ul className="flex justify-evenly space-x-4 text-sm font-normal">
+          <ul className="flex justify-evenly space-x-4 text-sm font-normal whitespace-pre items-center">
             <li>
               <Link href="/">Home</Link>
             </li>

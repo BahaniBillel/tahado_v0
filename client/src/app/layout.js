@@ -6,7 +6,6 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import Navigation from "../components/headers/navigation";
-import MiddleHeader from "../components/headers/middleHeader";
 
 import AuthProvider from "./context/AuthProvider";
 
@@ -37,6 +36,7 @@ function RootLayout({ children }) {
             <ApolloWrapper>
               <AuthProvider>
                 <Navigation />
+
                 <Toaster />
                 {children}
               </AuthProvider>

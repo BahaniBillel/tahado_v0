@@ -57,7 +57,7 @@ function ProductLy01({
   const { data: wishlistData, refetch: refetchWishlist } =
     useQuery(GET_WISHLIST);
 
-  console.log("logging from productlayout01", wishlistData);
+  // console.log("logging from productlayout01", wishlistData);
 
   useEffect(() => {
     // Check if the product is liked in localStorage when the component mounts

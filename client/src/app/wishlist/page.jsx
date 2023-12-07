@@ -23,6 +23,7 @@ export default async function Wishlist() {
     query: GET_WISHLIST_BY_USERID,
     variables: { userId },
     fetchPolicy: "network-only",
+
     context: {
       fetchOptions: {
         next: { revalidate: 1 },
