@@ -34,7 +34,7 @@ function ProductLy01({
   product_id,
 }) {
   const dispatch = useDispatch();
-  const [heart, setHeart] = useState(false);
+  const [heart, setHeart] = useState(true);
 
   // Hover
 
@@ -169,15 +169,15 @@ function ProductLy01({
 
   return (
     <div
-      className={`w-80 group `}
+      className={`w-80 group  hover:shadow-lg p-2 relative rounded-lg 
+   transition-all duration-300 ease-in-out `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div
         className={` ${"w-50" || width}  ${
           "h-80" || length
-        }  group  border border-charcoal/20 hover:shadow-lg p-2 relative rounded-sm 
-   transition-all duration-150 ease-in-out cursor-pointer`}
+        }  group  p-2 relative  ease-in-out cursor-pointer`}
       >
         {feature ? (
           <span
@@ -208,14 +208,14 @@ function ProductLy01({
           </button>
         </div>
       </div>
-      <div className="flex flex-row flex-nowrap text-sm space-y-3 items-center px-1">
-        <p>
-          {" "}
-          <span>دج</span>
-          <span>{price}</span>
-        </p>
+      <div className="flex flex-col flex-nowrap justify-start items-end text-right space-y-1 px-1">
+        <p className=" text-xl text-charcoal  line-clamp-2  ">{giftName}</p>
         <div className="flex-grow"></div>
-        <p className="whitespace-pre">{giftName}</p>
+
+        <div className="flex flex-row justify-start whitespace-pre space-x-1 text-charcoal font-extrabold ">
+          <p>دج</p>
+          <p>{price}</p>
+        </div>
       </div>
     </div>
   );

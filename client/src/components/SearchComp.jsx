@@ -77,20 +77,20 @@ const SearchComp = () => {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
   return (
-    <div className="relative flex flex-row justify-center items-center col-span-3 md:col-span-2 ml-5 h-full">
+    <div className="relative flex flex-row justify-center items-center col-span-3 md:col-span-2 ml-5 h-full w-full">
       <div className="relative" onMouseLeave={handleMouseLeave}>
         <input
           type="text"
           value={searchQuery}
-          className="border border-charcoal/50 w-full outline-none bg-gray-100 rounded-full 
-          text-right pr-3 py-2 active:bg-turquoise/20 "
+          className="border border-lightGray w-full outline-none bg-gray-100 rounded-full 
+          text-right pr-3 py-2 focus:bg-turquoise/50  "
           placeholder=" ...ابحث عن هدية "
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
         />
 
         <BsSearch
-          className="w-4 h-4 text-gray-500 absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+          className="w-4 h-4 text-charcoal/50 absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
           onClick={handleSearch}
         />
         {showSuggestions && filteredSuggestions.length > 0 && (

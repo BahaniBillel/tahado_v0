@@ -41,12 +41,12 @@ model shippingaddresses {
 
 model users {
   user_id           Int                 @id @default(autoincrement())
-  email             String              @unique @db.VarChar(100)
+  email             String?             @unique @db.VarChar(100)
   password_hash     String              @db.VarChar(100)
   first_name        String?             @db.VarChar(50)
   last_name         String?             @db.VarChar(50)
   address           String?             @db.VarChar(200)
-  phone_number      String?             @db.VarChar(20)
+  phone_number      String              @unique @db.VarChar(20)
   roles             String[]            @default(["user"]) // Default role for ordinary users
   orders            orders[]
   paymentmethods    paymentmethods[]

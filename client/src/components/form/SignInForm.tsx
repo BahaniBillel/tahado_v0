@@ -19,7 +19,10 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email"),
+  phone_number: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(/^[0-9]+$/, "Invalid phone number"),
   password: z
     .string()
     .min(1, "Password is required")
@@ -39,14 +42,14 @@ const SignInForm = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: "",
+      phone_number: "",
       password: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     const signInData = await signIn("credentials", {
-      email: values.email,
+      phone_number: values.phone_number,
       password: values.password,
       redirect: false,
     });
@@ -74,12 +77,12 @@ const SignInForm = () => {
           <div className="space-y-2">
             <FormField
               control={form.control}
-              name="email"
+              name="phone_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Phone number</FormLabel>
                   <FormControl>
-                    <Input placeholder="mail@example.com" {...field} />
+                    <Input placeholder=" votre numero" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -151,6 +151,7 @@ export const GET_ALL_ORDERS = gql`
         first_name
         last_name
         email
+        phone_number
       }
       order_date
       gifter_message

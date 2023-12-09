@@ -3,13 +3,14 @@ import { RiArrowUpSFill } from "react-icons/ri";
 import Link from "next/link";
 import Image from "next/image";
 import { links } from "./MyLinks";
-import SearchComp from "../SearchComp";
 
 function MiddleHeader() {
   return (
     <div className="  w-screen  md:px-20 flex flex-col  space-y-12 place-items-center mt-10  ">
       <div className="row-span-1 w-full md:w-3/5 px-10 ">
-        <SearchComp />
+        <p className="hidden md:block text-5xl text-right w-full whitespace-pre font-semibold">
+          اكتشف هدايا فريدة و منسقة لجميع مناسباتك
+        </p>
       </div>
       <div className="row-span-1 flex flex-row w-full overflow-x-auto justify-center space-x-16  py-5">
         {links.map((link, i) => (

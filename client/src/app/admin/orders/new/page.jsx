@@ -18,7 +18,7 @@ async function page() {
   console.log(ordersData.orders);
   return (
     <div className="h-screen py-4 text-xs px-2">
-      <table className="table-auto w-full text-left rounded-md  border border-lightGray">
+      <table className="table-fixed w-full text-left rounded-md  border border-lightGray">
         <thead className="bg-charcoal/80 text-turquoise font-light ">
           <tr className="capitalize ">
             <th className="p-2 whitespace-pre">order id</th>
@@ -28,6 +28,7 @@ async function page() {
             <th className="py-1 px-1 whitespace-pre">user id</th>
             <th className="py-1 px-1  whitespace-pre">first name</th>
             <th className="py-1 px-1 whitespace-pre">last name</th>
+            <th className="py-1 px-1 ">Phone number</th>
             <th className="py-1 px-1 ">email</th>
             <th className="py-1 px-1 whitespace-pre">gifter message</th>
             <th className="py-1 px-1">recipient</th>
@@ -48,6 +49,7 @@ async function page() {
               <td className="py-2">{order.user_id}</td>
               <td className="py-2">{`${order.user.first_name} `}</td>
               <td className="py-2">{`${order.user.last_name} `}</td>
+              <td className="py-2">{`${order.user.phone_number} `}</td>
               <td className="py-2">{`${order.user.email} `}</td>
               <td className="py-2">{order.gifter_message}</td>
               <td className="py-2">{order.recipient}</td>

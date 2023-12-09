@@ -25,11 +25,10 @@ export const options: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {
-          label: "email",
+        phone_number: {
+          label: "Phone Number",
           type: "text",
-          placeholder: "your email",
-          // http://localhost:3000/api/auth/providers/callback/google
+          placeholder: "123-456-7890",
         },
         password: {
           label: "Password:",
@@ -40,11 +39,11 @@ export const options: NextAuthOptions = {
       async authorize(credentials) {
         console.log("Inside authorize", credentials); // Debugging line
 
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.phone_number || !credentials?.password) {
           return null;
         }
         const existingUser = await db.users.findUnique({
-          where: { email: credentials?.email },
+          where: { phone_number: credentials?.phone_number },
         });
 
         if (!existingUser) {
@@ -72,7 +71,7 @@ export const options: NextAuthOptions = {
 
         return {
           user_id: `${existingUser.user_id}`,
-          email: existingUser.email,
+          phone_number: existingUser.phone_number,
           first_name: existingUser.first_name,
           roles: userRoles,
         };
@@ -85,7 +84,7 @@ export const options: NextAuthOptions = {
       if (user) {
         return {
           ...token,
-          email: user.email,
+          phone_number: user.phone_number,
           first_name: user.first_name,
           user_id: user.user_id,
           roles: user.roles,
@@ -99,7 +98,7 @@ export const options: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
-          email: token.email,
+          phone_number: token.phone_number,
           first_name: token.first_name,
           user_id: token.user_id,
           roles: token.roles,

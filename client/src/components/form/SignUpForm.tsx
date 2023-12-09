@@ -18,7 +18,11 @@ import GoogleSignInButton from "../GoogleSignInButton";
 
 const FormSchema = z
   .object({
-    email: z.string().min(1, "Email is required").email("Invalid email"),
+    phone_number: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^[0-9]+$/, "Invalid phone number"),
+
     password: z
       .string()
       .min(1, "Password is required")
@@ -34,7 +38,7 @@ const SignUpForm = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: "",
+      phone_number: "",
       password: "",
       confirmPassword: "",
     },
@@ -48,14 +52,15 @@ const SignUpForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <div className="space-y-2">
+          {/* Phone Number Field */}
           <FormField
             control={form.control}
-            name="email"
+            name="phone_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="mail@example.com" {...field} />
+                  <Input placeholder="123-456-7890" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

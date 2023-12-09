@@ -20,11 +20,7 @@ function BasketLength({ userId }) {
   }
 
   if (error) {
-    return (
-      <p className="text-white flex items-center justify-center">
-        Oops! Something went wrong ....
-      </p>
-    );
+    return <p className="text-white flex items-center justify-center">0</p>;
   }
 
   // Use the data directly as the query is already fetching orders for the given userId

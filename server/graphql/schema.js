@@ -54,12 +54,12 @@ const typeDefs = `#graphql
 
   type User {
     user_id: ID!
-    email: String!
+    email: String
     password_hash: String!
     first_name: String
     last_name: String
     address: String
-    phone_number: String
+    phone_number: String!
     roles: [String!]!  # Add this line for the roles field
     orders: [Order!]!
     paymentmethods: [PaymentMethod!]!
@@ -141,7 +141,7 @@ input AddInventoryInput{
   
 }
 input UserDataInput{
-  email:String!
+  phone_number:String!
   password_hash:String!
   first_name:String!
   last_name:String!

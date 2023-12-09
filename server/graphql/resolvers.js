@@ -96,7 +96,8 @@ const resolvers = {
   },
 
   Mutation: {
-    createCraftman: async (_, { craftmanData }) => {
+    createCraftman: async (_, { craftmanData }, context) => {
+      console.log("logging context from createCraftman", context);
       console.log("lgging from mutation resolver", craftmanData);
       try {
         // Check if the craftman already exists based on the name
@@ -296,10 +297,18 @@ const resolvers = {
       console.log(userDataInput);
 
       // Validate input
-      if (!userDataInput.email) {
-        throw new Error("Email is required");
+      if (!userDataInput.phone_number) {
+        throw new Error("phone_number is required");
       }
 
+      // Check if phone number already exists
+      const existingUser = await prisma.users.findUnique({
+        where: { phone_number: userDataInput.phone_number },
+      });
+
+      if (existingUser) {
+        throw new Error("A user with this phone number already exists");
+      }
       // Hash the password
       const saltRounds = 10;
       try {
@@ -310,6 +319,12 @@ const resolvers = {
 
         // Replace the plaintext password with the hashed password
         userDataInput.password_hash = hashedPassword;
+        // If there is no email put this default email
+
+        // TODO: add email to input and make the email optional in prisma
+        // if (!userDataInput.email) {
+        //   userDataInput.email = ""; // Provide a default email
+        // }
 
         // Create the user
         const user = await prisma.users.create({

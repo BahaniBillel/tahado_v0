@@ -17,11 +17,7 @@ function WishlistLength({ userId }) {
       </p>
     );
   if (error)
-    return (
-      <p className="text-white flex items-center justify-center">
-        Oops! Something went wrong ....
-      </p>
-    );
+    return <p className="text-white flex items-center justify-center">0</p>;
   // Filter the wishlist based on user_id
   const userWishlist = data.wishlist.filter((item) => item.user_id === userId);
 

@@ -10,7 +10,10 @@ import { toast } from "sonner";
 
 // Create Zod schema
 const userSchema = z.object({
-  email: z.string().email("Invalid email format"),
+  phone_number: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(/^[0-9]+$/, "Invalid phone number"),
   password_hash: z.string().min(8, "Password must be at least 8 characters"),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
@@ -35,7 +38,7 @@ const RegisterForm = () => {
     const mutation = gql`
       mutation Mutation($userDataInput: UserDataInput!) {
         createUser(userDataInput: $userDataInput) {
-          email
+          phone_number
           password_hash
           first_name
           last_name
@@ -75,8 +78,31 @@ const RegisterForm = () => {
           newErrors[path[0]] = message;
         });
         setErrors(newErrors);
+      } else if (error.response && error.response.errors) {
+        // Handle specific error from GraphQL response
+        const graphqlErrors = error.response.errors;
+        graphqlErrors.forEach((err) => {
+          if (err.message.includes("phone number already exists")) {
+            // Handle the phone number already exists error
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              phone_number: "This phone number is already registered",
+            }));
+            toast.error("This phone number is already registered");
+          } else if (err.message.includes("email already exists")) {
+            // Handle the email already exists error
+            setErrors((prevErrors) => ({
+              ...prevErrors,
+              email: "This email is already registered",
+            }));
+            toast.error("This email is already registered");
+          } else {
+            toast.error("Something went wrong while creating the user");
+          }
+        });
       } else {
         console.error("Error creating user:", error);
+        toast.error("Something went wrong while creating the user");
       }
     }
   };
@@ -93,19 +119,19 @@ const RegisterForm = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm  space-y-3">
-            {/* Email */}
+            {/* phone number */}
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email
+              <label htmlFor="phone_number" className="sr-only">
+                phone_number
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="phone_number"
+                name="phone_number"
+                type="phone_number"
                 required
                 onChange={handleInputChange}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-5"
-                placeholder="Email"
+                placeholder="votre numero"
               />
             </div>
 

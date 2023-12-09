@@ -4,7 +4,7 @@ import Gift from "../../../public/images/wedding-gift.jpg";
 
 function SectionLayout01() {
   return (
-    <div className=" flex flex-col md:grid grid-cols-6  md:h-screen md:py-10 bg-coralPinkLight gap-4 ">
+    <div className=" flex flex-col md:grid grid-cols-6  md:h-screen md:py-10 bg-lightGray gap-4 ">
       <div className=" col-span-2 flex flex-col justify-center items-end text-right pr-5 order-2  ">
         <p className="text-3xl font-semibold ">وعسى حياتك كلها سعيدة</p>
 
