@@ -31,7 +31,7 @@ function Navigation({ url }) {
 
   const pathname = useParams();
   const searchParams = useSearchParams();
-  console.log(pathname, searchParams);
+  // console.log(pathname, searchParams);
 
   // Get the user's session.
   const { data, status } = useSession();
@@ -42,55 +42,65 @@ function Navigation({ url }) {
   const userID = parseInt(data?.user?.user_id);
 
   return (
-    <div className="text-right  py-2   grid grid-cols-3 md:grid-cols-3 w-full md:px-20 place-items-center border-b border-b-charcoal/20">
-      {/* Search comp */}
-      <div className="bg-blue-800   ">
-        <SearchComp />
-      </div>
-      {/* The image */}
-      <div className="col-span-1">
-        <Link href="/">
-          {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
+    <div className="text-right      ">
+      <div className="grid grid-cols-3  md:grid-cols-3 w-full place-items-center md:px-20  border-b border-b-charcoal/20">
+        {/* Search comp */}
+        <div className="  col-span-1 w-full relative  ">
+          <SearchComp />
+        </div>
+        {/* The image */}
+        <div className="col-span-1 ">
+          <Link href="/">
+            {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
             TAHADO
           </p> */}
-          <Image src={Logo} height={100} />
-        </Link>
-      </div>
+            <Image src={Logo} height={100} />
+          </Link>
+        </div>
 
-      {/* Buttons */}
-      <div className=" hidden col-span-1  md:flex flex-row items-center ">
-        <p className="text-gray-800 tracking-wide whitespace-pre">
-          تهادو تحابو
-        </p>
+        {/* Buttons */}
+        <div className=" hidden col-span-1  md:flex flex-row items-center  ">
+          <ul className=" col-span-1 place-self-end w-full">
+            <ul className=" flex flex-row space-x-5 ">
+              <li className="md:midLink hidden relative "></li>
 
-        <ul className=" col-span-1 place-self-end w-full">
-          <ul className=" flex flex-row space-x-5 ">
-            <li className="md:midLink hidden relative "></li>
+              <Link href={`/checkout`}>
+                <li className="midLink relative">
+                  <IoIosBasket className="text-black h-10 cursor-pointer " />
+                  <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
+                    {/* {items ? items.length : 0} */}
+                    <BasketLength userId={userID} />
+                  </span>
+                </li>
+              </Link>
 
-            <Link href={`/wishlist`}>
-              <li className="md:midLink  relative">
-                <RiHeart2Fill className="text-black h-10 cursor-pointer " />
-                <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-                  {/* {likes ? likes.length : 0} */}
-                  <WishlistLength userId={userID} />
-                </span>
+              <Link href={`/wishlist`}>
+                <li className="md:midLink  relative">
+                  <RiHeart2Fill className="text-black h-10 cursor-pointer " />
+                  <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
+                    {/* {likes ? likes.length : 0} */}
+                    <WishlistLength userId={userID} />
+                  </span>
+                </li>
+              </Link>
+
+              <li className="midLink">
+                <RiUser2Fill className="text-black h-10 cursor-pointer " />
+                {isUserSignIn ? <UserSignOutButton /> : <UserSignInButton />}
               </li>
-            </Link>
-            <Link href={`/checkout`}>
-              <li className="midLink relative">
-                <IoIosBasket className="text-black h-10 cursor-pointer " />
-                <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-                  {/* {items ? items.length : 0} */}
-                  <BasketLength userId={userID} />
-                </span>
-              </li>
-            </Link>
-            <li className="midLink">
-              <RiUser2Fill className="text-black h-10 cursor-pointer " />
-              {isUserSignIn ? <UserSignOutButton /> : <UserSignInButton />}
-            </li>
+            </ul>
           </ul>
-        </ul>
+        </div>
+      </div>
+      <div
+        className="h-8 bg-turquoise text-charcoal 
+      items-center justify-center text-center w-full col-span-3 grid grid-cols-3"
+      >
+        <p className="col-span-1">phones number</p>
+        <p className="text-gray-800 tracking-wide whitespace-pre col-span-1">
+          @ تهادو تحابو
+        </p>
+        <p className="col-span-1">socials links</p>
       </div>
       <div className="col-span-1 block md:hidden ">
         <RiMenuLine className="text-black h-10 cursor-pointer " />

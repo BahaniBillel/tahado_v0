@@ -2,6 +2,7 @@ import ProductsLine from "../components/layouts/ProductsLine";
 import SectionLayout01 from "../components/layouts/SectionLayout01";
 import SectionLayout02 from "../components/layouts/SectionLayout02";
 import SectionLayout03 from "../components/layouts/SectionLayout03";
+import SectionLayout04 from "../components/layouts/SectionLayout04";
 
 // Apollo Client for linking backend graphQL
 
@@ -9,6 +10,7 @@ import TextGraphql from "../components/TextGraphql";
 import { getClient } from "../app/lib/client";
 import { GET_OCCASIONS, GET_PORODUCT_OCCASION } from "../graphql/querries";
 import MiddleHeader from "../components/headers/middleHeader";
+import HeroImage01 from "../components/HeroImage01";
 
 export default async function Home() {
   const client = getClient();
@@ -34,7 +36,7 @@ export default async function Home() {
     },
   });
 
-  console.log("productOccasionData from home", productOccasionData);
+  // console.log("productOccasionData from home", productOccasionData);
 
   const occasionsArray = occasionsData.occasions.map(
     (occasion) => occasion.name
@@ -42,8 +44,10 @@ export default async function Home() {
 
   console.log(productOccasionData.products.length);
   return (
-    <main className="">
+    <main className=" relative">
+      <HeroImage01 />
       <MiddleHeader />
+      <SectionLayout04 />
       <ProductsLine
         giftsData={productOccasionData.products}
         lineID={1}

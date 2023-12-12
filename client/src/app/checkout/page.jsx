@@ -2,16 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { selectItems, selectTotal } from "../../../slices/basketSlice";
 import { useSelector } from "react-redux";
-import CheckoutProduct from "../../components/checkoutProduct";
+import CheckoutProduct from "../../components/checkout/checkoutProduct";
 
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { resetItems } from "../../../slices/basketSlice";
+import { GET_ALL_ORDERS } from "../../graphql/querries"; // Import your queries
+import { GraphQLClient } from "graphql-request";
+import { useMutation, useQuery } from "@apollo/client";
 
 function Checkout() {
-  // Redirect to the home page
-  // const router = useRouter();
   const dispatch = useDispatch();
   const subTotal = useSelector(selectTotal);
   const items = useSelector(selectItems);
@@ -157,12 +158,59 @@ function Checkout() {
     setWilaya(e.target.value);
   };
 
+  // GRAPHQL SETUP
+  const {
+    data: ordersData,
+    loading: ordersLoading,
+    error: ordersError,
+    refetch,
+  } = useQuery(GET_ALL_ORDERS, {
+    fetchPolicy: "network-only",
+    pollInterval: 500,
+  });
+
+  useEffect(() => {
+    // Function to execute the desired action, for example, refetching the data
+    const fetchData = () => {
+      refetch();
+    };
+
+    // Call the function
+    fetchData();
+
+    // Set up the polling (re-fetching) interval
+    const interval = setInterval(fetchData, 500);
+
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(interval);
+  }, [refetch]); // Add any dependencies for useEffect here
+
+  // Render your component based on the state of the query
+  if (ordersLoading) return <p>Loading...</p>;
+  if (ordersError) return <p>Error :(</p>;
+
+  // console.log(ordersData.orders);
+
+  function formatTimestamp(timestampString) {
+    // Convert the string to a number
+    const timestamp = parseInt(timestampString);
+
+    // Create a new Date object
+    const date = new Date(timestamp);
+
+    // Format the date
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
   return (
     <div className="px-3 md:px-10 py-5">
       <p className="font-bold text-2xl text-right ">: سلة الهدايا </p>
-      <div className="  flex  flex-col md:grid grid-cols-2  max-h-full w-full p-3 md:p-5 font-sans rounded-md bg-lightGray">
+      <div className="  flex  flex-col items-start md:grid grid-cols-2  max-h-full w-full p-3 md:p-5 font-sans rounded-md bg-lightGray">
         <section className="flex flex-col items-center justify-center  py-5 col-span-1 order-1 w-full ">
-          <form className="    flex flex-col space-y-3 items-start  md:px-10 py-5 w-full ">
+          <form className="    flex flex-col space-y-3 items-start  md:px-10  w-full ">
             <h1 className="text-xl md:text-2xl text-charcoal font-semibold py-4">
               Enter your delivery address
             </h1>
@@ -341,14 +389,17 @@ function Checkout() {
             {items.length ? "Vous avez Commandé :" : "There is no items"}
           </p>
           <div>
-            {items?.map((item, i) => (
+            {ordersData.orders.map((order) => (
               <CheckoutProduct
-                key={i}
-                name={item.name}
-                productImage={item.productImage}
-                price={item.price}
-                category={item.category}
-                quantity={item.quantity}
+                key={order.order_id}
+                orderId={order.order_id}
+                name={`${order.orderitems[0].product.giftname}`}
+                productImage={order.orderitems[0].product.main_image}
+                price={`${order.orderitems[0].product.price}`}
+                amount={order.total_amount}
+                recipient={order.recipient}
+                quantity={order.orderitems[0].quantity}
+                gifting_date={formatTimestamp(order.wished_gift_date)}
                 isCheckout={true}
               />
             ))}

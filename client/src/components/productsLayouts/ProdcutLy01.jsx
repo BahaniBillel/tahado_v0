@@ -170,7 +170,7 @@ function ProductLy01({
   return (
     <div
       className={`w-80 group  hover:shadow-lg p-2 relative rounded-lg 
-   transition-all duration-300 ease-in-out `}
+   transition-all duration-75 ease-in-out `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -181,7 +181,8 @@ function ProductLy01({
       >
         {feature ? (
           <span
-            className={`absolute -left-1 top-1 text-xs font-light px-3 py-1 ${featureColor}  bg-black text-white rounded-r-xl`}
+            className={`absolute left-1 top-2 text-xs font-light px-3 py-1
+             ${featureColor}  bg-black text-white rounded-r-xl`}
           >
             {feature}
           </span>
@@ -194,6 +195,7 @@ function ProductLy01({
               fill={fill}
               width={300}
               height={300}
+              className="rounded-sm"
             />
           </div>
         </Link>

@@ -143,6 +143,8 @@ export const GET_ALL_ORDERS = gql`
       orderitems {
         product {
           giftname
+          main_image
+          price
         }
         quantity
       }
@@ -186,6 +188,16 @@ export const GET_SEARCH_PRODUCTS = gql`
       productreviews {
         rating
       }
+    }
+  }
+`;
+
+export const GET_PRICE_LIST = gql`
+  query PriceList {
+    products {
+      gift_id
+      giftname
+      price
     }
   }
 `;

@@ -1,7 +1,7 @@
 import React from "react";
 import { GET_WISHLIST_BY_USERID } from "../../graphql/querries";
 import { getClient } from "../lib/client";
-import CheckoutProduct from "../../components/checkout/checkoutProduct";
+import WishProduct from "../../components/wishProduct";
 import { getServerSession } from "next-auth";
 import { options } from "../api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
@@ -46,7 +46,7 @@ export default async function Wishlist() {
 
           {/* Use the CheckoutProduct component for each wishlist item */}
           {wishlistItem.wishlistitems.map((wishlistItemDetail) => (
-            <CheckoutProduct
+            <WishProduct
               key={wishlistItemDetail.product_id}
               product={wishlistItemDetail}
             />

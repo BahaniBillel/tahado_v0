@@ -111,9 +111,13 @@ const typeDefs = `#graphql
   createUser(userDataInput:UserDataInput!):User!
 addInventory(addInventoryInput:AddInventoryInput!):Inventory!
    addToOrder(addToOrderInput: AddOrderItemInput!): AddOrderItemResponse!
+   removeItem(removeItemInput:RemoveItemInput!):AddOrderItemResponse!
 }
 
-
+input RemoveItemInput {
+ item_id: ID!
+   order_id: ID!
+}
 
 input AddOrderItemInput {
   user_id: Int!

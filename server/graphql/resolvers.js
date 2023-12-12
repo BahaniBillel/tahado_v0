@@ -517,6 +517,46 @@ const resolvers = {
         throw new Error("Failed to add item to order");
       }
     },
+
+    removeItem: async (_, { removeItemInput }) => {
+      const { item_id, order_id } = removeItemInput;
+
+      try {
+        // Start a transaction
+        await prisma.$transaction(async (prisma) => {
+          // Remove the item from orderitems
+          await prisma.orderitems.delete({
+            where: {
+              item_id: parseInt(item_id),
+            },
+          });
+
+          // Check if there are any items left in the order
+          const remainingItems = await prisma.orderitems.count({
+            where: {
+              order_id: parseInt(order_id),
+            },
+          });
+
+          // If no items left, remove the order
+          if (remainingItems === 0) {
+            await prisma.orders.delete({
+              where: {
+                order_id: parseInt(order_id),
+              },
+            });
+          }
+        });
+
+        return {
+          success: true,
+          message: "Item and order updated successfully",
+        };
+      } catch (error) {
+        console.error("Error removing item from order:", error);
+        return { success: false, message: "Error removing item from order" };
+      }
+    },
   },
   Order: {
     user: (parent) =>

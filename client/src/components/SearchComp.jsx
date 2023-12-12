@@ -38,12 +38,12 @@ const SearchComp = () => {
     }
   };
 
-  console.log("Search Query:", searchQuery);
-  console.log("Filtered Products:", filteredProducts);
+  // console.log("Search Query:", searchQuery);
+  // console.log("Filtered Products:", filteredProducts);
 
   // Log each product's giftname for inspection
   filteredProducts.forEach((product) => {
-    console.log("Product giftname:", product.giftname);
+    // console.log("Product giftname:", product.giftname);
   });
 
   const handleKeyPress = (event) => {
@@ -77,24 +77,31 @@ const SearchComp = () => {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
 
   return (
-    <div className="relative flex flex-row justify-center items-center col-span-3 md:col-span-2 ml-5 h-full w-full">
-      <div className="relative" onMouseLeave={handleMouseLeave}>
-        <input
-          type="text"
-          value={searchQuery}
-          className="border border-lightGray w-full outline-none bg-gray-100 rounded-full 
-          text-right pr-3 py-2 focus:bg-turquoise/50  "
-          placeholder=" ...ابحث عن هدية "
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-        />
+    <div className="relative flex flex-row justify-center items-center  ml-5 h-full w-full ">
+      <div className="relative w-full group  " onMouseLeave={handleMouseLeave}>
+        <div className="overflow-hidden relative rounded-full">
+          <input
+            type="text"
+            value={searchQuery}
+            className="border border-lightGray w-full outline-none bg-gray-100 rounded-full 
+          text-right pr-3 py-2 focus:bg-lightGray/50  "
+            placeholder=" ...ابحث عن هدية "
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+          />
 
-        <BsSearch
-          className="w-4 h-4 text-charcoal/50 absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
-          onClick={handleSearch}
-        />
+          <BsSearch
+            className="w-8 h-8 text-white absolute left-2 top-1/2 bg-turquoise 
+          rounded-full p-1 transform -translate-y-1/2 cursor-pointer 
+          group-hover:rounded-r-none group-hover:h-14 group-hover:w-14
+           group-hover:p-4 ease-in-out transition-all duration-200 group-hover:-left-2"
+            onClick={handleSearch}
+          />
+        </div>
+
+        {/* Logic for search propositions */}
         {showSuggestions && filteredSuggestions.length > 0 && (
-          <div className="absolute z-50 top-full text-charcoal bg-white border border-gray-300 border-t-0 rounded-b-xl w-full shadow-lg">
+          <div className="absolute z-50 top-full text-charcoal bg-white border border-lightGray border-t-0 rounded-b-xl w-full shadow-lg">
             {filteredSuggestions.map((product) => (
               <div
                 key={product.id}

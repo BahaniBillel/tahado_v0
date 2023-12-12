@@ -6,9 +6,9 @@ import { links } from "./MyLinks";
 
 function MiddleHeader() {
   return (
-    <div className="  w-screen  md:px-20 flex flex-col  space-y-12 place-items-center mt-10  ">
-      <div className="row-span-1 w-full md:w-3/5 px-10 ">
-        <p className="hidden md:block text-5xl text-right w-full whitespace-pre font-semibold">
+    <div className="  w-screen  md:px-20 flex flex-col justify-center items-center  space-y-12 place-items-center mt-10  ">
+      <div className="row-span-1 w-full  px-10  ">
+        <p className="hidden md:block text-5xl text-center  w-full whitespace-pre ">
           اكتشف هدايا فريدة و منسقة لجميع مناسباتك
         </p>
       </div>
@@ -16,7 +16,7 @@ function MiddleHeader() {
         {links.map((link, i) => (
           <div key={link.id} className="navOption group">
             <Link href={`/categories${link.page}`}>
-              <div className="overflow-hidden rounded-full w-36 h-36 relative">
+              <div className="overflow-hidden rounded-full w-32 h-32 relative hover:scale-105 hover:shadow-sm duration-100 ease-out transition-all">
                 <Image src={link.image} alt={link.name} />
               </div>
               <h1 className="text-gray-800 text-sm group-hover:underline my-2 cursor-pointer">
