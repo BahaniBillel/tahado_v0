@@ -115,7 +115,7 @@ addInventory(addInventoryInput:AddInventoryInput!):Inventory!
 }
 
 input RemoveItemInput {
- item_id: ID!
+ 
    order_id: ID!
 }
 

@@ -3,6 +3,7 @@ import SectionLayout01 from "../components/layouts/SectionLayout01";
 import SectionLayout02 from "../components/layouts/SectionLayout02";
 import SectionLayout03 from "../components/layouts/SectionLayout03";
 import SectionLayout04 from "../components/layouts/SectionLayout04";
+import Example from "../components/example";
 
 // Apollo Client for linking backend graphQL
 
@@ -47,6 +48,8 @@ export default async function Home() {
     <main className=" relative">
       <HeroImage01 />
       <MiddleHeader />
+
+      <Example />
       <SectionLayout04 />
       <ProductsLine
         giftsData={productOccasionData.products}

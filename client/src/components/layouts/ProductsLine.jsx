@@ -7,7 +7,7 @@ import "keen-slider/keen-slider.min.css";
 // Components
 import ProductLy01 from "../productsLayouts/ProdcutLy01";
 import DefaultImage from "../../../public/images/defaultGiftImage.jpg";
-import FadeTransition from "./FadeTransition";
+import FadeTransition from "../transitionsComps/FadeTransition";
 
 // Helpers
 import { getImages, s3Client } from "../../helpers/s3Helpers";

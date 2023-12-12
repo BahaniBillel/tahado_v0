@@ -95,15 +95,16 @@ model craftmen {
 }
 
 model orders {
-  order_id         Int          @id @default(autoincrement())
+  order_id         Int              @id @default(autoincrement())
   user_id          Int?
-  order_date       DateTime?    @db.Date
-  recipient        String?      @db.VarChar
-  gifter_message   String?      @db.VarChar
-  wished_gift_date DateTime     @default(now())
-  total_amount     Decimal?     @db.Decimal(10, 0)
+  order_date       DateTime?        @db.Date
+  recipient        String?          @db.VarChar
+  gifter_message   String?          @db.VarChar
+  wished_gift_date DateTime         @default(now())
+  total_amount     Decimal?         @db.Decimal(10, 0)
   orderitems       orderitems[]
-  users            users?       @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  users            users?           @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  deliveryOption   DeliveryOptions? // New relation field
 }
 
 model orderitems {
@@ -162,4 +163,39 @@ model ProductOccasion {
   occasions  Occasion @relation(fields: [occasionId], references: [id])
 
   @@id([productId, occasionId])
+}
+
+model DeliveryOptions {
+  delivery_option_id Int               @id @default(autoincrement())
+  provider_name      String            @db.VarChar(100)
+  city               String            @db.VarChar(50)
+  delivery_time_id   Int?
+  order_id           Int?              @unique // Make this field unique
+  orders             orders?           @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction)
+  DeliveryPricing    DeliveryPricing[]
+  DeliveryTime       DeliveryTime[]
+
+  @@index([city], name: "idx_delivery_options_city")
+}
+
+model DeliveryPricing {
+  pricing_id         Int     @id @default(autoincrement())
+  delivery_option_id Int
+  base_price         Decimal @db.Decimal(10, 2)
+  additional_cost    Decimal @db.Decimal(10, 2)
+  total_price        Decimal @db.Decimal(10, 2) // Computed field: base_price + additional_cost
+
+  deliveryOptions DeliveryOptions @relation(fields: [delivery_option_id], references: [delivery_option_id])
+
+  @@index([delivery_option_id], name: "idx_delivery_pricing_delivery_option")
+}
+
+model DeliveryTime {
+  delivery_time_id   Int @id @default(autoincrement())
+  delivery_option_id Int
+  estimated_time     Int // Time in hours or days
+
+  deliveryOptions DeliveryOptions @relation(fields: [delivery_option_id], references: [delivery_option_id])
+
+  @@index([delivery_option_id], name: "idx_delivery_time_delivery_option")
 }

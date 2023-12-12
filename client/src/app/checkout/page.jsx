@@ -386,7 +386,9 @@ function Checkout() {
         </section>
         <section className="col-span-1 order-2 bg-white px-5 py-5 rounded-md ">
           <p className="font-bold text-xl py-2">
-            {items.length ? "Vous avez Commandé :" : "There is no items"}
+            {ordersData.orders.length
+              ? "Vous avez Commandé :"
+              : "There is no items"}
           </p>
           <div>
             {ordersData.orders.map((order) => (

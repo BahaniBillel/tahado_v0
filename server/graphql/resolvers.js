@@ -519,7 +519,15 @@ const resolvers = {
     },
 
     removeItem: async (_, { removeItemInput }) => {
-      const { item_id, order_id } = removeItemInput;
+      const { order_id } = removeItemInput;
+
+      const findItemId = await prisma.orderitems.findFirst({
+        where: {
+          order_id: parseInt(removeItemInput.order_id),
+        },
+      });
+
+      const item_id = findItemId.item_id;
 
       try {
         // Start a transaction

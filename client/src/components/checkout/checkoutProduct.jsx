@@ -55,18 +55,31 @@ function CheckoutProduct({
     });
   };
 
-  const removeItemFromBasket = () => {
-    // dispatch(removeFromBasket({ name }));
-  };
+  const removeItemFromBasket = async (orderId) => {
+    const client = new GraphQLClient("http://localhost:3001/graphql");
 
-  const items = useSelector(selectItems);
+    const mutation = `
+    mutation RemoveItem($removeItemInput: RemoveItemInput!) {
+      removeItem(removeItemInput: $removeItemInput) {
+        order {
+          order_id
+        }
+       
+      }
+    }
+  `;
 
-  const getTotalQuantity = () => {
-    let total = 0;
-    items.forEach((item) => {
-      total += item.quantity;
-    });
-    return total;
+    try {
+      await client.request(mutation, {
+        removeItemInput: { order_id: orderId },
+      });
+      toast.success("Item removed successfully");
+      // Here, also dispatch to Redux if needed
+      // dispatch(removeFromBasket({ name }));
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Something went wrong while removing the item");
+    }
   };
 
   // GRAPHQL SETUP
@@ -105,7 +118,6 @@ function CheckoutProduct({
     (order) => order.order_id === orderId
   );
 
-  console.log("existingOrder", existingOrder.order_id);
   return (
     <div
       className="grid grid-cols-5 gap-y-10  border-lightGray border-solid border mb-1 py-2 px-5 h-36 overflow-hidden bg-white cursor-pointer
@@ -123,7 +135,7 @@ function CheckoutProduct({
         <div
           className="flex flex-row rounded-md p-2  hover:border-greenSecondary
          hover:shadow-md hover:bg-lightEmerald hover:scale-95 transition-all duration-150 ease-in-out group"
-          onClick={removeItemFromBasket}
+          onClick={() => removeItemFromBasket(orderId)}
         >
           <TrashIcon className="h-5 text-greenSecondary mr-1 group-hover:text-greenSecondary" />
           <p className="text-greenSecondary text-sm tracking-wide group-hover:text-greenSecondary">
