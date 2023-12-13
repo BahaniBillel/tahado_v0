@@ -17,7 +17,7 @@ export default function ThankYou() {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 ">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full sm:w-96 text-center">
+      <div className="bg-white p-8 rounded-lg w-full sm:w-96 text-center">
         {/* Placeholder for an image */}
         <div className="mb-4 relative">
           <Image src={ThankYouImage} objectFit="cover" alt="thankyou image" />

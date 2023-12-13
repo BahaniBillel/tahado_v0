@@ -73,6 +73,7 @@ export const options: NextAuthOptions = {
           user_id: `${existingUser.user_id}`,
           phone_number: existingUser.phone_number,
           first_name: existingUser.first_name,
+          last_name: existingUser.last_name,
           roles: userRoles,
         };
       },

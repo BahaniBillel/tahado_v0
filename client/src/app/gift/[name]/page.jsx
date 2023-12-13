@@ -21,6 +21,7 @@ async function GiftDetail({ params }) {
   const { data: productsData } = await client.query({
     query: GET_PRODUCTS,
     fetchPolicy: "network-only",
+
     context: {
       fetchOptions: {
         next: { revalidate: 5 },

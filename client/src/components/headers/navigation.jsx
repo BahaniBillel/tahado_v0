@@ -10,16 +10,16 @@ import {
 import { IoIosBasket } from "react-icons/io";
 import Link from "next/link";
 import Logo from "../../../public/images/logo-blue.png";
-import DropDownMenu from "./dropdown";
+import UserDropDownMenu from "./UserDropDownMenu";
 import Image from "next/image";
+import UserSignInButton from "../UserSignInButton";
 
 // Redux
 import { useSelector } from "react-redux";
 import { selectItems, selectLikes } from "../../../slices/basketSlice";
 
 import { getSession, useSession } from "next-auth/react";
-import UserSignOutButton from "../UserSignOutButton";
-import UserSignInButton from "../UserSignInButton";
+
 import WishlistLength from "../WishlistLength";
 import BasketLength from "../BasketLength";
 import { useParams, useSearchParams } from "next/navigation";
@@ -36,9 +36,10 @@ function Navigation({ url }) {
   // Get the user's session.
   const { data, status } = useSession();
 
-  // console.log("This data from naigation bar", data);
+  console.log("This data from naigation bar", data);
 
-  const isUserSignIn = data?.user?.first_name;
+  const firstName = data?.user?.first_name;
+  const lastName = data?.user?.last_name;
   const userID = parseInt(data?.user?.user_id);
 
   return (
@@ -84,9 +85,15 @@ function Navigation({ url }) {
                 </li>
               </Link>
 
-              <li className="midLink">
-                <RiUser2Fill className="text-black h-10 cursor-pointer " />
-                {isUserSignIn ? <UserSignOutButton /> : <UserSignInButton />}
+              <li className="midLink relative">
+                {firstName ? (
+                  <UserDropDownMenu
+                    first_name={firstName}
+                    last_name={lastName}
+                  />
+                ) : (
+                  <UserSignInButton />
+                )}
               </li>
             </ul>
           </ul>
