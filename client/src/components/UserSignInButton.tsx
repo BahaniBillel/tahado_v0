@@ -6,7 +6,8 @@ import { RiLoginBoxLine } from "react-icons/ri";
 function UserSignInButton() {
   return (
     <Button variant="default" onClick={() => signIn()}>
-      <RiLoginBoxLine />
+      {/* <RiLoginBoxLine /> */}
+      sign in
     </Button>
   );
 }

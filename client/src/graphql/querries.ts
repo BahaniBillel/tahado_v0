@@ -103,7 +103,7 @@ export const GET_PRODUCTS = gql`
       price
       url
       sku
-
+      main_image
       occasions {
         occasion {
           name

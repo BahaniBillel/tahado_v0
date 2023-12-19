@@ -27,35 +27,66 @@ function CheckoutProduct({
   amount,
   price,
   quantity,
-  gifting_date,
-  orderId,
+  productId,
 }) {
   const dispatch = useDispatch();
+  // const items = useSelector(selectItems);
 
   const [orderQuantity, setOrderQuantity] = useState(quantity);
   const [orderAmount, setOrderAmount] = useState(amount);
   const orderPrice = parseInt(price);
 
+  // console.log("orderQuantity", orderQuantity, orderAmount, amount);
+
+  // const increaseProduct = () => {
+  //   setOrderQuantity((prev) => {
+  //     const newQuantity = prev + 1;
+  //     setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
+  //     console.log(" logging prices parameters:", newQuantity, orderPrice);
+  //     // Dispatch action to increment quantity in Redux store
+  //     dispatch(incrementQuantity({ productId: productId, newQuantity, price }));
+
+  //     return newQuantity;
+  //   });
+  // };
+
+  // const decrementProduct = () => {
+  //   setOrderQuantity((prev) => {
+  //     if (prev > 1) {
+  //       // Ensure quantity doesn't go below 1
+  //       const newQuantity = prev - 1;
+  //       setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
+
+  //       // Dispatch action to decrement quantity in Redux store
+  //       dispatch(decrementQuantity({ productId: productId, newQuantity }));
+
+  //       return newQuantity;
+  //     }
+  //     return prev;
+  //   });
+  // };
+
   const increaseProduct = () => {
-    setOrderQuantity((prev) => {
-      const newQuantity = prev + 1;
-      setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
-      return newQuantity;
-    });
+    dispatch(incrementQuantity({ productId: productId, price }));
   };
 
   const decrementProduct = () => {
-    setOrderQuantity((prev) => {
-      if (prev > 0) {
-        const newQuantity = prev - 1;
-        setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
-        return newQuantity;
-      }
-      return 0;
-    });
+    if (quantity > 1) {
+      dispatch(decrementQuantity({ productId: productId }));
+    }
   };
 
   const removeItemFromBasket = async (orderId) => {
+    // Remove item from redux store
+    dispatch(removeFromBasket(orderId));
+
+    // Remove item from database, but it's not working since the orderId
+    // is created a the moment the order is submitted
+    // it means that orderId doesn't even exist in the database orders table
+    // This function can be implemented once the order is created
+    // use it in user profile section : purchases and reviews
+    // note that the order cannot be removed once the order is delivered
+
     const client = new GraphQLClient("http://localhost:3001/graphql");
 
     const mutation = `
@@ -112,15 +143,17 @@ function CheckoutProduct({
   // Render your component based on the state of the query
   if (ordersLoading) return <p>Loading...</p>;
   if (ordersError) return <p>Error :(</p>;
-  console.log(ordersData.orders);
+  // console.log(ordersData.orders);
 
   const existingOrder = ordersData.orders.find(
-    (order) => order.order_id === orderId
+    (order) => order.order_id === productId
   );
 
   return (
     <div
-      className="grid grid-cols-5 gap-y-10  border-lightGray border-solid border mb-1 py-2 px-5 h-36 overflow-hidden bg-white cursor-pointer
+      className="grid grid-cols-5 gap-y-10  border-lightGray
+       border-solid border mb-1 py-2 px-5 h-36 overflow-hidden
+        bg-white cursor-pointer
       hover:shadow-md rounded-sm "
     >
       <div className="flex flex-col space-y-2 ">
@@ -134,8 +167,9 @@ function CheckoutProduct({
         <div className="flex flex-grow"></div>
         <div
           className="flex flex-row rounded-md p-2  hover:border-greenSecondary
-         hover:shadow-md hover:bg-lightEmerald hover:scale-95 transition-all duration-150 ease-in-out group"
-          onClick={() => removeItemFromBasket(orderId)}
+         hover:shadow-md hover:bg-lightEmerald hover:scale-95 transition-all 
+         duration-150 ease-in-out group"
+          onClick={() => removeItemFromBasket(productId)}
         >
           <TrashIcon className="h-5 text-greenSecondary mr-1 group-hover:text-greenSecondary" />
           <p className="text-greenSecondary text-sm tracking-wide group-hover:text-greenSecondary">
@@ -162,15 +196,10 @@ function CheckoutProduct({
         <p className="font-light text-xs md:text-sm mt-2 line-clamp-3">
           {recipient}
         </p>
-        <p className="font-light text-xs md:text-sm mt-2 line-clamp-3">
-          {gifting_date}
-        </p>
       </div>
       {/* right section */}
       <div className="col-span-1  flex flex-col items-end  ">
-        <div className="font-semibold text-sm whitespace-pre">
-          {orderAmount} DA
-        </div>
+        <div className="font-semibold text-sm whitespace-pre">{amount} DA</div>
         <div className="flex flex-row space-x-3 items-center mt-5 whitespace-pre">
           <button
             className="bg-greenSecondary py-1 px-3 rounded-sm text-black hover:scale-95 transition-shadow duration-150"
@@ -178,7 +207,7 @@ function CheckoutProduct({
           >
             -
           </button>
-          <p>{orderQuantity}</p>
+          <p>{quantity}</p>
           <button
             className="bg-greenPrimary py-1 px-3 rounded-sm text-black shadow-md hover:scale-95 transition-shadow duration-150"
             onClick={increaseProduct}

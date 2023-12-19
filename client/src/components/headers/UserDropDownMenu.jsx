@@ -1,6 +1,6 @@
 "use state";
-import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
+import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { RiUserFill } from "react-icons/ri";
 import { PiSignInFill } from "react-icons/pi";
@@ -11,6 +11,9 @@ import { MdOutlineLocalOffer } from "react-icons/md";
 import { BsNewspaper } from "react-icons/bs";
 import { MdNotificationsActive } from "react-icons/md";
 import { LuSettings } from "react-icons/lu";
+import { RxDashboard } from "react-icons/rx";
+
+import Link from "next/link";
 
 import { getSession, useSession } from "next-auth/react";
 import UserSignOutButton from "../UserSignOutButton";
@@ -20,7 +23,7 @@ export default function UserDropDownMenu({ first_name, last_name }) {
   // Get the user's session.
   const { data, status } = useSession();
 
-  console.log("This data from naigation bar", data);
+  console.log("This data from naigation bar", data.user);
 
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
@@ -79,7 +82,7 @@ export default function UserDropDownMenu({ first_name, last_name }) {
                     )}
                     <div className="flex flex-col flex-nowrap justify-center items-start whitespace-pre ml-1">
                       <p className="font-semibold text-base">
-                        Hi, {first_name} {last_name}
+                        Hi, {firstName} {lastName}
                       </p>
                       <p className="text-xs text-charcoal/70">
                         View your profile
@@ -94,6 +97,33 @@ export default function UserDropDownMenu({ first_name, last_name }) {
                   </button>
                 )}
               </Menu.Item>
+              {role === "admin" ? (
+                <Menu.Item>
+                  {({ active }) => (
+                    <Link
+                      href="/admin"
+                      className={`${
+                        active
+                          ? "bg-turquoise/40 text-charcoal/80"
+                          : "text-charcoal"
+                      } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    >
+                      {active ? (
+                        <RxDashboard
+                          className="mr-2 h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <RxDashboard
+                          className="mr-2 h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      )}
+                      Dashboard
+                    </Link>
+                  )}
+                </Menu.Item>
+              ) : null}
               <Menu.Item>
                 {({ active }) => (
                   <button

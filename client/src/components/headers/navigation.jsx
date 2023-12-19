@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 // import { Bars3BottomRightIcon } from "@heroicons/react/24/solid";
 import {
   RiSearchEyeLine,
@@ -24,10 +24,19 @@ import WishlistLength from "../WishlistLength";
 import BasketLength from "../BasketLength";
 import { useParams, useSearchParams } from "next/navigation";
 import SearchComp from "../SearchComp";
+import UserInfo from "../user/userInfo";
 
 function Navigation({ url }) {
   const items = useSelector(selectItems);
   const likes = useSelector(selectLikes);
+
+  const [isItems, setIsItems] = useState();
+
+  useEffect(() => {
+    setIsItems(items);
+  }, [items]);
+
+  console.log("likes from navigation :", likes[0]?.product_id);
 
   const pathname = useParams();
   const searchParams = useSearchParams();
@@ -36,14 +45,15 @@ function Navigation({ url }) {
   // Get the user's session.
   const { data, status } = useSession();
 
-  console.log("This data from naigation bar", data);
+  console.log("This data from naigation bar", data?.user);
 
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
   const userID = parseInt(data?.user?.user_id);
 
+  console.log("last_name", firstName);
   return (
-    <div className="text-right      ">
+    <div className="text-right ">
       <div className="grid grid-cols-3  md:grid-cols-3 w-full place-items-center md:px-20  border-b border-b-charcoal/20">
         {/* Search comp */}
         <div className="  col-span-1 w-full relative  ">
@@ -65,25 +75,26 @@ function Navigation({ url }) {
             <ul className=" flex flex-row space-x-5 ">
               <li className="md:midLink hidden relative "></li>
 
-              <Link href={`/checkout`}>
-                <li className="midLink relative">
+              <li className="midLink relative">
+                <Link href={`/checkout`}>
                   <IoIosBasket className="text-black h-10 cursor-pointer " />
                   <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-                    {/* {items ? items.length : 0} */}
+                    {isItems ? isItems.length : 0}
+
                     <BasketLength userId={userID} />
                   </span>
-                </li>
-              </Link>
+                </Link>
+              </li>
 
-              <Link href={`/wishlist`}>
-                <li className="md:midLink  relative">
+              <li className="md:midLink  relative">
+                <Link href={`/wishlist`}>
                   <RiHeart2Fill className="text-black h-10 cursor-pointer " />
                   <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-                    {/* {likes ? likes.length : 0} */}
-                    <WishlistLength userId={userID} />
+                    {likes ? likes.length : 0}
+                    {/* <WishlistLength userId={userID} /> */}
                   </span>
-                </li>
-              </Link>
+                </Link>
+              </li>
 
               <li className="midLink relative">
                 {firstName ? (

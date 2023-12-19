@@ -1,0 +1,27 @@
+  // Remove item from database, but it's not working since the orderId
+    // is created a the moment the order is submitted
+    // it means that orderId doesn't even exist in the database orders table
+    // This function can be implemented once the order is created
+    // use it in user profile section : purchases and reviews
+    // note that the order cannot be removed once the order is delivered
+
+
+
+     // Remove item from redux store
+
+
+       const decrementProduct = () => {
+    setOrderQuantity((prev) => {
+      if (prev > 1) {
+        // Ensure quantity doesn't go below 1
+        const newQuantity = prev - 1;
+        setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
+
+        // Dispatch action to decrement quantity in Redux store
+        dispatch(decrementQuantity({ productId: orderId, newQuantity }));
+
+        return newQuantity;
+      }
+      return prev;
+    });
+  };

@@ -87,6 +87,7 @@ export const options: NextAuthOptions = {
           ...token,
           phone_number: user.phone_number,
           first_name: user.first_name,
+          last_name: user.last_name,
           user_id: user.user_id,
           roles: user.roles,
         };

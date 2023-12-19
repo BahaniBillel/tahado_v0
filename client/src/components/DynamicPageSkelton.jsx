@@ -22,12 +22,18 @@ import {
 
 import NextJsCarousel from "../utils/ResponsiveCarousel";
 import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
+import { addToBasket, selectItems } from "../../slices/basketSlice";
 
 function DynamicPageSkelton({ data, giftId }) {
   // FETCHING IMAGES FROM AMAEZON S3
   const [images, setImages] = useState([]);
   const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
   const [open, setOpen] = React.useState(false); // For Yetanother lightbox
+  const dispatch = useDispatch();
+  const items = useSelector(selectItems);
+
+  console.log("itesm:", items);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -75,57 +81,22 @@ function DynamicPageSkelton({ data, giftId }) {
     defaultValues: {},
   });
 
-  const addToOrder = async (addToOrderInput) => {
-    const client = new GraphQLClient("http://localhost:3001/graphql");
-    const mutation = `
-      mutation AddToOrder($addToOrderInput: AddOrderItemInput!) {
-        addToOrder(addToOrderInput: $addToOrderInput) {
-          order {
-            user_id
-            order_date
-            recipient
-            gifter_message
-            wished_gift_date
-          }
-          orderItem {
-            product_id
-            quantity
-            product {
-              price
-            }
-          }
-        }
-      }
-    `;
-
-    try {
-      const response = await client.request(
-        mutation,
-
-        {
-          addToOrderInput: addToOrderInput,
-        }
-      );
-      console.log("Order Response:", response);
-    } catch (error) {
-      console.error("Order Submission Error:", error);
-    }
-  };
-
   const onSubmit = async (formData) => {
-    console.log("Form Data:", formData);
-    console.log(parseInt(formData.quantity));
-    const addToOrderInput = {
-      user_id: user_id,
-      product_id: parseInt(data.gift_id),
-      recipient: formData.recipient,
-      gifter_message: formData.gifter_message,
-      quantity: parseInt(formData.quantity),
-      price: data.price,
-    };
+    //  Dispatch product to redux store
+    dispatch(
+      addToBasket({
+        product_id: parseInt(data.gift_id),
+        giftname: data.giftname,
+        recipient: formData.recipient,
+        gifter_message: formData.gifter_message,
+        quantity: parseInt(formData.quantity),
+        price: data.price,
+        main_image: data.main_image,
+      })
+    );
 
-    await addToOrder(addToOrderInput);
     toast.success(`${data.giftname} was added to basket`);
+
     reset();
   };
 

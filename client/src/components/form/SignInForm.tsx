@@ -17,6 +17,11 @@ import Link from "next/link";
 import GoogleSignInButton from "../GoogleSignInButton";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import {
+  selectLastVisitedUrl,
+  clearLastVisitedUrl,
+} from "../../../slices/basketSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 const FormSchema = z.object({
   phone_number: z
@@ -31,7 +36,10 @@ const FormSchema = z.object({
 
 const SignInForm = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { data, status, update } = useSession();
+  const lastVisitedUrl = useSelector(selectLastVisitedUrl);
+  console.log("lastvisit☺edUrl from sigin:", lastVisitedUrl);
 
   console.log("checking data from useSession", data);
 
@@ -57,12 +65,17 @@ const SignInForm = () => {
     if (signInData?.error) {
       console.log(signInData.error);
     } else {
-      if (isAdmin) {
-        router.push("/admin");
-        router.refresh();
+      if (lastVisitedUrl === "/checkout") {
+        router.push(lastVisitedUrl);
+        dispatch(clearLastVisitedUrl());
       } else {
-        router.push("/");
-        router.refresh();
+        if (isAdmin) {
+          router.push("/admin");
+          router.refresh();
+        } else {
+          router.push("/");
+          router.refresh();
+        }
       }
     }
   };

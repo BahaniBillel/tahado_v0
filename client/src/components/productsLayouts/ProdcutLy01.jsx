@@ -68,12 +68,7 @@ function ProductLy01({
   }, [user_id, product_id, wishlistData]);
 
   const product = {
-    mainImage,
-    giftName,
-    price,
-    feature,
-    featureColor,
-    link,
+    product_id,
   };
 
   const ToggleLikes = async () => {
@@ -156,7 +151,7 @@ function ProductLy01({
         });
 
         console.log("Removed from wishlist:", response);
-        dispatch(decrementLikes({ giftName }));
+        dispatch(decrementLikes(product));
       }
 
       // Refetch the wishlist query to get updated data
