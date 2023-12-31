@@ -112,51 +112,6 @@ function Checkout() {
     }
   };
 
-  // const SubmitOrderToDatabase = async (e, total, delivery) => {
-  //   e.preventDefault();
-
-  //   // check if there is an item in the basket
-  //   if (isItems.length === 0) {
-  //     notify(`aint no item in the basket`);
-
-  //     return;
-  //   }
-
-  //   console.log("firstname", firstName);
-  //   if (!firstName) {
-  //     dispatch(setLastVisitedUrl(pathname));
-  //     router.push("/sign-in");
-  //   }
-  //   // User is signed in, proceed to submit the order
-
-  //   // Prepare the data for the GraphQL mutation
-  //   const addToOrderInput = isItems.map((item) => ({
-  //     user_id: userID,
-  //     product_id: item.product_id,
-  //     recipient: item.recipient,
-  //     gifter_message: item.gifter_message,
-  //     quantity: item.quantity,
-  //     price: item.price,
-  //   }));
-
-  //   // Submit each item in the order
-  //   for (const orderItem of addToOrderInput) {
-  //     try {
-  //       await addToOrder(orderItem);
-  //       console.log(`${orderItem.product_id} was added to the order`);
-  //     } catch (error) {
-  //       console.error("Order Submission Error:", error);
-  //       // Handle error appropriately
-  //     }
-  //   }
-
-  //   await addToOrder(addToOrderInput);
-  //   // Dispatch the resetItems action to clear the Redux store
-  //   dispatch(resetItems());
-
-  //   toast.success("Order was successfully submitted");
-  // };
-
   const SubmitOrderToDatabase = async (e, total, delivery) => {
     e.preventDefault();
 
@@ -194,6 +149,8 @@ function Checkout() {
 
       // Only reset the items if the order submission is successful
       dispatch(resetItems());
+
+      router.push("/checkout/thanks");
     } catch (error) {
       console.error("Order Submission Error:", error);
       // Handle submission error

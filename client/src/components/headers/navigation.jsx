@@ -9,7 +9,7 @@ import {
 } from "react-icons/ri";
 import { IoIosBasket } from "react-icons/io";
 import Link from "next/link";
-import Logo from "../../../public/images/logo-blue.png";
+import Logo from "../../../public/images/logo-new.png";
 import UserDropDownMenu from "./UserDropDownMenu";
 import Image from "next/image";
 import UserSignInButton from "../UserSignInButton";
@@ -30,13 +30,19 @@ function Navigation({ url }) {
   const items = useSelector(selectItems);
   const likes = useSelector(selectLikes);
 
+  console.log("likes from navigatioon :", likes);
+
   const [isItems, setIsItems] = useState();
+  const [isLikes, setLikes] = useState();
 
   useEffect(() => {
     setIsItems(items);
   }, [items]);
 
-  console.log("likes from navigation :", likes[0]?.product_id);
+  useEffect(() => {
+    setLikes(likes);
+  }, [likes]);
+  // console.log("likes from navigation :", likes[0]?.product_id);
 
   const pathname = useParams();
   const searchParams = useSearchParams();
@@ -53,7 +59,7 @@ function Navigation({ url }) {
 
   console.log("last_name", firstName);
   return (
-    <div className="text-right ">
+    <div className="text-right bg-white">
       <div className="grid grid-cols-3  md:grid-cols-3 w-full place-items-center md:px-20  border-b border-b-charcoal/20">
         {/* Search comp */}
         <div className="  col-span-1 w-full relative  ">
@@ -65,7 +71,7 @@ function Navigation({ url }) {
             {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
             TAHADO
           </p> */}
-            <Image src={Logo} height={100} />
+            <Image src={Logo} height={150} />
           </Link>
         </div>
 
@@ -79,7 +85,7 @@ function Navigation({ url }) {
                 <Link href={`/checkout`}>
                   <IoIosBasket className="text-black h-10 cursor-pointer " />
                   <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-                    {isItems ? isItems.length : 0}
+                    {isItems ? isItems?.length : 0}
 
                     <BasketLength userId={userID} />
                   </span>
@@ -90,8 +96,15 @@ function Navigation({ url }) {
                 <Link href={`/wishlist`}>
                   <RiHeart2Fill className="text-black h-10 cursor-pointer " />
                   <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
-                    {likes ? likes.length : 0}
-                    {/* <WishlistLength userId={userID} /> */}
+                    {/* {userID ? (
+                      <WishlistLength userId={userID} />
+                    ) : likes ? (
+                      likes?.length
+                    ) : (
+                      0
+                    )} */}
+
+                    <WishlistLength userId={userID} />
                   </span>
                 </Link>
               </li>
@@ -111,7 +124,7 @@ function Navigation({ url }) {
         </div>
       </div>
       <div
-        className="h-8 bg-turquoise text-charcoal 
+        className="h-8 bg-lightPink text-charcoal 
       items-center justify-center text-center w-full col-span-3 grid grid-cols-3"
       >
         <p className="col-span-1">phones number</p>

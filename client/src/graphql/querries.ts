@@ -13,9 +13,11 @@ export const GET_CATEGORIES = gql`
 export const GET_USERS = gql`
   query Users {
     users {
+      user_id
       first_name
       last_name
       email
+      phone_number
     }
   }
 `;

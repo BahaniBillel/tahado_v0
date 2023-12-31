@@ -5,6 +5,7 @@ const initialState = {
   likes: [],
   heart: [],
   lastVisitedUrl: null,
+  lastLikedItem: null,
 };
 
 export const basketSlice = createSlice({
@@ -112,6 +113,29 @@ export const basketSlice = createSlice({
       state.likes = newLikes;
     },
 
+    toggleLike: (state, action) => {
+      const productId = action.payload;
+      const index = state.likes.indexOf(productId);
+
+      if (index !== -1) {
+        // Product is already liked, remove it using splice
+        state.likes.splice(index, 1);
+      } else {
+        // Product is not liked, add it
+        state.likes.push(productId);
+      }
+    },
+
+    // Reducer to synchronize likes
+    synchronizeLikes: (state, action) => {
+      const likedProductIds = action.payload; // Array of product IDs
+      state.likes = likedProductIds;
+    },
+
+    resetLikes: (state) => {
+      state.likes = [];
+    },
+
     // Reducer to save the last visited URL
     setLastVisitedUrl: (state, action) => {
       state.lastVisitedUrl = action.payload;
@@ -121,6 +145,16 @@ export const basketSlice = createSlice({
     clearLastVisitedUrl: (state) => {
       state.lastVisitedUrl = null;
     },
+
+    // Reducer to save the lastliked item
+    setLastLikedItem: (state, action) => {
+      state.lastLikedItem = action.payload;
+    },
+
+    // Reducer to clear the last Liked Item
+    clearLastVisitedUrl: (state) => {
+      state.lastLikedItem = null;
+    },
   },
 });
 
@@ -129,10 +163,14 @@ export const {
   removeFromBasket,
   incrementLikes,
   decrementLikes,
+  toggleLike,
+  synchronizeLikes,
   incrementQuantity,
   decrementQuantity,
   resetItems,
+  resetLikes,
   setLastVisitedUrl,
+  setLastLikedItem,
   clearLastVisitedUrl,
 } = basketSlice.actions;
 
@@ -143,7 +181,11 @@ export const selectTotal = (state) =>
 // Selector to get the last visited URL from the state
 export const selectLastVisitedUrl = (state) => state.basket.lastVisitedUrl;
 
+// Selector to get the last liked item from the state
+export const selectLastLikedItem = (state) => state.basket.lastLikedItem;
+
 export const selectLikes = (state) => state.basket.likes;
+
 export const selectHeartState = (state) => state.basket.heart;
 
 export default basketSlice.reducer;

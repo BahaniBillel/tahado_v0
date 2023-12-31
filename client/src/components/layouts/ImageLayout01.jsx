@@ -139,12 +139,12 @@ function ImageLayout01({ image, alt, price, currency }) {
         {price ? (
           <div
             className=" whitespace-pre mt-2 font-sans absolute left-1 bottom-2 
-      rounded-full px-2 py-1 w-fit flex flex-row  space-x-3 flex-nowrap  bg-lightGray"
+      rounded-full px-2 py-1 w-fit flex flex-row  space-x-3 flex-nowrap  bg-lightPink"
           >
-            <p className=" text-xs font-medium">
+            <p className=" text-xs font-medium text-charcoal">
               {currency} {price}
             </p>
-            <p className=" text-xs font-light line-through">
+            <p className=" text-xs font-light line-through text-charcoal/50">
               {currency} {price}
             </p>
           </div>

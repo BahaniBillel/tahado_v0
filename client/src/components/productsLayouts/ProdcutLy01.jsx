@@ -2,12 +2,19 @@
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-
+import { useRouter, useParams, usePathname } from "next/navigation";
 import { HeartIcon } from "@heroicons/react/24/solid";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { incrementLikes, decrementLikes } from "../../../slices/basketSlice";
+import {
+  incrementLikes,
+  decrementLikes,
+  setLastVisitedUrl,
+  setLastLikedItem,
+  toggleLike,
+  selectLikes,
+} from "../../../slices/basketSlice";
 
 // import { PostWishlist, RemoveWishlist } from "../../app/api/wishlistAPIs";
 
@@ -34,15 +41,20 @@ function ProductLy01({
   product_id,
 }) {
   const dispatch = useDispatch();
-  const [heart, setHeart] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
+  const [heart, setHeart] = useState(false); // Default to not liked
+  const userId = parseInt(user_id, 10);
+  const [currentImage, setCurrentImage] = useState(mainImage);
+  const isUserSignedIn = userId ? true : false;
+  const productId = parseInt(product_id, 10);
 
-  // Hover
+  // Fetch like status from Redux
+  const likes = useSelector(selectLikes);
 
   useEffect(() => {
     setCurrentImage(mainImage);
   }, [mainImage]);
-
-  const [currentImage, setCurrentImage] = useState(mainImage);
 
   const handleMouseEnter = () => {
     setCurrentImage(secondImage);
@@ -57,24 +69,17 @@ function ProductLy01({
   const { data: wishlistData, refetch: refetchWishlist } =
     useQuery(GET_WISHLIST);
 
-  // console.log("logging from productlayout01", wishlistData);
+  const ToggleLikesWhenSignedIn = async () => {
+    // If user not signedIn , Save the last liked item
+    // push the user to signIn
+    // Then return to the last page the user was in it
+    if (!isUserSignedIn) {
+      dispatch(setLastLikedItem(productId));
 
-  useEffect(() => {
-    // Check if the product is liked in localStorage when the component mounts
-    const likedProducts =
-      JSON.parse(localStorage.getItem("likedProducts")) || {};
-    const isLiked = likedProducts[`${user_id}_${product_id}`] || false;
-    setHeart(isLiked);
-  }, [user_id, product_id, wishlistData]);
-
-  const product = {
-    product_id,
-  };
-
-  const ToggleLikes = async () => {
-    const userId = parseInt(user_id, 10);
-    const productId = parseInt(product_id, 10);
-
+      dispatch(setLastVisitedUrl(pathname));
+      router.push("/sign-in");
+      return; // Stop further execution
+    }
     // Initialize GraphQLClient
     const client = new GraphQLClient("http://localhost:3001/graphql");
 
@@ -106,11 +111,6 @@ function ProductLy01({
       }
     `;
 
-    // Define input type for the mutation
-    const wishlistRemoveData = {
-      wishlist_id: parseInt(wishlistData.wishlist_id, 10),
-    };
-
     try {
       // Toggle the heart state
       setHeart(!heart);
@@ -126,7 +126,8 @@ function ProductLy01({
         console.log("Wishlist Data:", wishlistData);
         const response = await client.request(mutation, { wishData });
 
-        dispatch(incrementLikes(product));
+        // dispatch(incrementLikes(product));
+        return response;
       } else {
         // Remove from wishlist logic
         const wishlistWithItem = wishlistData.wishlist.find((wishlist) =>
@@ -151,7 +152,7 @@ function ProductLy01({
         });
 
         console.log("Removed from wishlist:", response);
-        dispatch(decrementLikes(product));
+        // dispatch(decrementLikes(product));
       }
 
       // Refetch the wishlist query to get updated data
@@ -161,6 +162,34 @@ function ProductLy01({
       // Handle error
     }
   };
+
+  // This will correctly toggle the heart state based on Redux store
+  useEffect(() => {
+    setHeart(likes.includes(productId));
+  }, [likes, productId]);
+
+  function doesProductIdExist(productId, data) {
+    for (let i = 0; i < data?.wishlist.length; i++) {
+      const wishlistItems = data?.wishlist[i].wishlistitems;
+      for (let j = 0; j < wishlistItems.length; j++) {
+        if (wishlistItems[j].product_id === productId) {
+          return true; // Product ID found
+        }
+      }
+    }
+    return false; // Product ID not found
+  }
+
+  const productIdToCheck = productId;
+  useEffect(() => {
+    const exists = doesProductIdExist(productIdToCheck, wishlistData);
+    setHeart(exists);
+    console.log(
+      `Product ID ${productIdToCheck} ${
+        exists ? "exists" : "does not exist"
+      } in the wishlist.`
+    );
+  }, [productIdToCheck, wishlistData]); // Dependencies array
 
   return (
     <div
@@ -196,7 +225,7 @@ function ProductLy01({
         </Link>
 
         <div className="absolute right-5 top-5 z-40 ">
-          <button onClick={ToggleLikes}>
+          <button onClick={ToggleLikesWhenSignedIn}>
             {heart ? (
               <HeartIcon className="h-6 text-red " />
             ) : (

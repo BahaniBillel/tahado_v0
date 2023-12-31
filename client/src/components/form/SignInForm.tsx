@@ -20,8 +20,14 @@ import { useRouter } from "next/navigation";
 import {
   selectLastVisitedUrl,
   clearLastVisitedUrl,
+  setLastVisitedUrl,
+  selectLastLikedItem,
 } from "../../../slices/basketSlice";
 import { useSelector, useDispatch } from "react-redux";
+
+import { GET_USERS } from "../../graphql/querries";
+import { useMutation, useQuery } from "@apollo/client";
+import { GraphQLClient, gql } from "graphql-request";
 
 const FormSchema = z.object({
   phone_number: z
@@ -39,7 +45,10 @@ const SignInForm = () => {
   const dispatch = useDispatch();
   const { data, status, update } = useSession();
   const lastVisitedUrl = useSelector(selectLastVisitedUrl);
+  const lastLikedItem = useSelector(selectLastLikedItem);
+  const productId = parseInt(lastLikedItem);
   console.log("lastvisit☺edUrl from sigin:", lastVisitedUrl);
+  console.log("lastLikedItem from sigin:", lastLikedItem);
 
   console.log("checking data from useSession", data);
 
@@ -47,6 +56,10 @@ const SignInForm = () => {
   const isAdmin = data?.user?.roles?.includes("admin");
   console.log("chcking if the user has admin previliges", isAdmin);
 
+  // GraphQL Query to get users data
+
+  const { data: usersData, refetch: refetchUsers } = useQuery(GET_USERS);
+  console.log(usersData);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -55,12 +68,69 @@ const SignInForm = () => {
     },
   });
 
+  const AddLike = async (userId) => {
+    // Initialize GraphQLClient
+    const client = new GraphQLClient("http://localhost:3001/graphql");
+
+    // Define the GraphQL mutation
+    const mutation = gql`
+      mutation CreateWishItem($wishData: WishInput!) {
+        createWishItem(wishData: $wishData) {
+          wishlist {
+            wishlist_id
+          }
+          product {
+            gift_id
+          }
+        }
+      }
+    `;
+
+    // Construct the wishData object
+    const wishData = {
+      user_id: userId, // GET IT FROM AUTH ONCE USER IS SIGNEDIN
+      product_id: productId, // GET IT FROM REDUX STORE
+    };
+
+    try {
+      // If the product is not currently liked, add it to the wishlist
+      if (userId) {
+        const response = await client.request(mutation, { wishData });
+
+        return response;
+      }
+    } catch (error) {
+      console.error("Error in ToggleLikes:", error);
+      // Handle error
+    }
+  };
+
+  function findUserByPhoneNumber(phoneNumber: string) {
+    const users = usersData.users;
+    for (let i = 0; i < users.length; i++) {
+      if (users[i].phone_number === phoneNumber) {
+        return users[i];
+      }
+    }
+    return null; // Return null if no user with the given phone number is found
+  }
+
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     const signInData = await signIn("credentials", {
       phone_number: values.phone_number,
       password: values.password,
       redirect: false,
     });
+
+    const user = findUserByPhoneNumber(values.phone_number);
+    const userId = parseInt(user.user_id);
+
+    if (user && signInData) {
+      console.log("User found:", user.phone_number);
+      await AddLike(userId);
+    } else {
+      console.log("No user found with phone number:", values.phone_number);
+    }
 
     if (signInData?.error) {
       console.log(signInData.error);

@@ -91,7 +91,7 @@ const SearchComp = () => {
           />
 
           <BsSearch
-            className="w-8 h-8 text-white absolute left-2 top-1/2 bg-turquoise 
+            className="w-8 h-8 text-white absolute left-2 top-1/2 bg-lightPink 
           rounded-full p-1 transform -translate-y-1/2 cursor-pointer 
           group-hover:rounded-r-none group-hover:h-14 group-hover:w-14
            group-hover:p-4 ease-in-out transition-all duration-200 group-hover:-left-2"

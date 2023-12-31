@@ -6,7 +6,7 @@ import ImageLayout01 from "./ImageLayout01";
 
 export default function SectionLayout03() {
   return (
-    <div className="px-16 py-4 h-96 mt-16 ">
+    <div className="px-16 py-4 h-96 mt-16 text-white ">
       <h1 className="mb-2 text-right font-medium text-lg">
         تم عرضها مؤخرًا والمزيد{" "}
       </h1>
@@ -43,7 +43,7 @@ export default function SectionLayout03() {
           </div>
         </div>
         <div
-          className="p-4 bg-turquoise rounded-md col-span-1 h-full flex flex-col
+          className="p-4 bg-magenta rounded-md col-span-1 h-full flex flex-col
         justify-center space-y-2 shadow-md"
         >
           <h3 className="font-semibold text-lg">GET THE TOP GIFTS TRENDS</h3>

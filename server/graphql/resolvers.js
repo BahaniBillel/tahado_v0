@@ -99,6 +99,10 @@ const resolvers = {
     createCraftman: async (_, { craftmanData }, context) => {
       console.log("logging context from createCraftman", context);
       console.log("lgging from mutation resolver", craftmanData);
+
+      if (!context.user || !context.user.roles.includes("admin")) {
+        throw new Error("Unauthorized");
+      }
       try {
         // Check if the craftman already exists based on the name
         const existingCraftman = await prisma.craftmen.findFirst({
@@ -122,8 +126,11 @@ const resolvers = {
       }
     },
 
-    createOccasion: async (_, { occasionData }) => {
+    createOccasion: async (_, { occasionData }, context) => {
       console.log("logging from resolvers", occasionData);
+      if (!context.user || !context.user.roles.includes("admin")) {
+        throw new Error("Unauthorized");
+      }
       try {
         const existingOccasion = await prisma.occasion.findFirst({
           where: { name: occasionData.name },
@@ -144,7 +151,10 @@ const resolvers = {
       }
     },
 
-    createCategory: async (_, { categoryData }) => {
+    createCategory: async (_, { categoryData }, context) => {
+      if (!context.user || !context.user.roles.includes("admin")) {
+        throw new Error("Unauthorized");
+      }
       try {
         // Check if the category already exists based on the name
         const existingCategory = await prisma.categories.findFirst({
@@ -168,7 +178,10 @@ const resolvers = {
       }
     },
 
-    createGift: async (_, { giftData }) => {
+    createGift: async (_, { giftData }, context) => {
+      if (!context.user || !context.user.roles.includes("admin")) {
+        throw new Error("Unauthorized");
+      }
       const { category_id, occasionIds, ...giftDetails } = giftData;
       console.log(
         "createGift about to be sent to tables:",
@@ -228,7 +241,10 @@ const resolvers = {
       }
     },
 
-    createWishItem: async (_, { wishData }) => {
+    createWishItem: async (_, { wishData }, context) => {
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       const { user_id, product_id } = wishData;
 
       console.log("Logging createwishItem", user_id, product_id);
@@ -259,7 +275,10 @@ const resolvers = {
         throw new Error("Failed to create wishlist item");
       }
     },
-    removeFromWishList: async (_, { wishlistRemoveData }) => {
+    removeFromWishList: async (_, { wishlistRemoveData }, context) => {
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       const { wishlist_id } = wishlistRemoveData;
       console.log("logging from remove resolver :", wishlist_id);
       try {
@@ -293,7 +312,10 @@ const resolvers = {
       }
     },
 
-    createUser: async (_, { userDataInput }) => {
+    createUser: async (_, { userDataInput }, context) => {
+      if (!context.user || !context.user.roles.includes("admin")) {
+        throw new Error("Unauthorized");
+      }
       console.log(userDataInput);
 
       // Validate input
@@ -360,7 +382,10 @@ const resolvers = {
       }
     },
 
-    addInventory: async (_, { addInventoryInput }) => {
+    addInventory: async (_, { addInventoryInput }, context) => {
+      if (!context.user || !context.user.roles.includes("admin")) {
+        throw new Error("Unauthorized");
+      }
       console.log("addInventoryResolver:", addInventoryInput);
       try {
         // Check if an inventory record with this product_id already exists
@@ -394,7 +419,7 @@ const resolvers = {
       }
     },
 
-    addToOrder: async (_, { addToOrderInput }) => {
+    addToOrder: async (_, { addToOrderInput }, context) => {
       const {
         user_id,
 

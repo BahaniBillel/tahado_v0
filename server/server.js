@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const _ = require("lodash");
 const { ApolloServer } = require("apollo-server-express");
+const apolloMiddleware = require("@apollo/server/express4").expressMiddleware;
 
 const app = express();
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
@@ -15,13 +16,28 @@ const port = process.env.PORT || 3002;
 
 async function startApolloServer() {
   const app = express();
-  const server = new ApolloServer({
+  const apolloserver = new ApolloServer({
     typeDefs,
     resolvers,
-  });
-  await server.start();
+    context: ({ req }) => {
+      // If there's no authorization header, return context without user
+      if (!req.headers.authorization) {
+        return {};
+      }
 
-  server.applyMiddleware({ app });
+      const token = req.headers.authorization.split(" ")[1]; // Assuming a 'Bearer <token>' format
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return { user: decoded };
+      } catch (error) {
+        throw new AuthenticationError("Invalid or expired token");
+      }
+    },
+  });
+
+  await apolloserver.start();
+
+  apolloserver.applyMiddleware({ app });
 
   app.use((req, res) => {
     res.status(200);
@@ -29,11 +45,16 @@ async function startApolloServer() {
     res.end();
   });
 
+  // function getContext({ req }) {
+  //   console.log(req.auth);
+  // }
+  // app.use("/graphql", apolloMiddleware(apolloserver, { context: getContext }));
+
   await new Promise((resolve) => app.listen(port, resolve));
   console.log(
-    `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
+    `🚀 Server ready at http://localhost:${port}${apolloserver.graphqlPath}`
   );
-  return { server, app };
+  return { apolloserver, app };
 }
 
 startApolloServer();

@@ -11,11 +11,11 @@ import Link from "next/link";
 import { TbBrandBlogger } from "react-icons/tb";
 
 import { useSelector } from "react-redux";
-// import { selectItems, selectLikes } from "../../redux/slices/basketSlice";
+import { selectItems, selectLikes } from "../../slices/basketSlice";
 
 function BottomNavigationBar() {
   //   const items = useSelector(selectItems);
-  //   const likes = useSelector(selectLikes);
+  const likes = useSelector(selectLikes);
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -40,9 +40,10 @@ function BottomNavigationBar() {
 
   return (
     <div
-      className={`flex justify-center md:hidden flex-row space-x-8 bg-white border-t border-t-charcoal/20 py-3 fixed bottom-0 left-0 w-full shadow-md px-2 transition-transform duration-300 ${
-        isVisible ? "translate-y-0" : "translate-y-full"
-      }`}
+      className={`flex justify-center md:hidden flex-row space-x-8 z-50 bg-white border-t border-t-charcoal/20 py-3 fixed
+       bottom-0 left-0 w-full shadow-md px-2 transition-transform duration-300 ${
+         isVisible ? "translate-y-0" : "translate-y-full"
+       }`}
     >
       <div className="flex flex-col text-xs font-light items-center justify-center cursor-pointer ">
         <ImHome3 className="h-6 w-6" />
@@ -83,7 +84,7 @@ function BottomNavigationBar() {
           <p className="text-gray-600 relative">
             Likes
             <span className=" absolute -top-4 left-2/4 text-white text-xs font-bold   z-10  bg-red-600 py-1 px-2 rounded-full">
-              {/* {likes ? likes.length : 0} */}
+              {likes ? likes.length : 0}
             </span>
           </p>
         </div>

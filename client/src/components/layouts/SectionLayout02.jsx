@@ -5,7 +5,7 @@ import Gift2 from "../../../public/images/baby-gift.jpg";
 
 export default function SectionLayout02() {
   return (
-    <div className=" flex flex-col md:grid grid-cols-6  md:h-screen md:py-5 bg-turquoise gap-4 relative ">
+    <div className=" flex flex-col md:grid grid-cols-6  md:h-screen md:py-5 bg-turquoise gap-4 relative text-white">
       <div className=" col-span-3 flex flex-col justify-center items-end text-right px-10 md:px-44 order-2  ">
         <p className="text-3xl font-semibold ">وعسى حياتك كلها سعيدة</p>
 
@@ -14,7 +14,7 @@ export default function SectionLayout02() {
           طول الزمان وعرض المكان ليحققا كل الأحلام.
         </p>
 
-        <p className="button bg-coralPinkLight">اكتشف الهدايا</p>
+        <p className="button bg-lightPink text-charcoal">اكتشف الهدايا</p>
       </div>
       <div
         className=" absolute left-32 md:left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 px-5

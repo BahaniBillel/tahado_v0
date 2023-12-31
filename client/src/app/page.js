@@ -12,6 +12,8 @@ import { getClient } from "../app/lib/client";
 import { GET_OCCASIONS, GET_PORODUCT_OCCASION } from "../graphql/querries";
 import MiddleHeader from "../components/headers/middleHeader";
 import HeroImage01 from "../components/HeroImage01";
+import HeroImage02 from "../components/HeroImage02";
+import BottomNavigationBar from "../components/BottomNavigation";
 
 export default async function Home() {
   const client = getClient();
@@ -45,11 +47,11 @@ export default async function Home() {
 
   console.log(productOccasionData.products.length);
   return (
-    <main className=" relative">
+    <main className=" relative ">
       <HeroImage01 />
       <MiddleHeader />
 
-      <Example />
+      {/* <Example /> */}
       <SectionLayout04 />
       <ProductsLine
         giftsData={productOccasionData.products}
@@ -104,6 +106,7 @@ export default async function Home() {
         occasionLabel={occasionsArray[6]}
         occasionName={occasionsArray[6]}
       />
+      <BottomNavigationBar />
     </main>
   );
 }
