@@ -19,7 +19,10 @@ export const basketSlice = createSlice({
       if (itemExists) {
         itemExists.quantity += 1;
       } else {
-        state.items = [...state.items, { ...action.payload, quantity: 1 }];
+        state.items = [
+          ...state.items,
+          { ...action.payload, quantity: action.payload.quantity },
+        ];
       }
 
       if (typeof window !== "undefined") {
@@ -28,19 +31,7 @@ export const basketSlice = createSlice({
         localStorage.setItem("items", JSON.stringify(state.items));
       }
     },
-    // incrementQuantity: (state, action) => {
-    //   const { productId, price } = action.payload;
-    //   const item = state.items.find((item) => item.product_id === productId);
-    //   console.log("from increase quantity:", item.quantity);
-    //   if (item && item.quantity) {
-    //     const prevQuantity = item.quantity;
-    //     item.quantity += 1;
-    //     const priceIncrement = price / prevQuantity;
-    //     item.price += priceIncrement;
-    //   } else {
-    //     return;
-    //   }
-    // },
+
     incrementQuantity: (state, action) => {
       const { productId } = action.payload;
       const item = state.items.find((item) => item.product_id === productId);

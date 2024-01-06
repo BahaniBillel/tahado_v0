@@ -37,6 +37,7 @@ function Checkout() {
   const [enabled, setEnabled] = useState(false);
 
   console.log("isItems", isItems);
+  console.log("items", items);
 
   const [order, setOrder] = React.useState({});
 
@@ -83,6 +84,8 @@ function Checkout() {
           order {
             user_id
             order_date
+            sender
+            flower_pocket
             recipient
             gifter_message
           
@@ -132,7 +135,9 @@ function Checkout() {
     const addToOrderInput = isItems.map((item) => ({
       user_id: userID,
       product_id: item.product_id,
+      sender: item.sender,
       recipient: item.recipient,
+      flower_pocket: item.flower_pocket === "true", // Convert string to boolean
       gifter_message: item.gifter_message,
       quantity: item.quantity,
       price: item.price,
@@ -142,6 +147,7 @@ function Checkout() {
       // Submit each item in the order
       for (const orderItem of addToOrderInput) {
         await addToOrder(orderItem);
+        console.log("orderItem :", orderItem);
       }
 
       // Notify the user of success
@@ -205,20 +211,6 @@ function Checkout() {
 
   // console.log(ordersData.orders);
 
-  function formatTimestamp(timestampString) {
-    // Convert the string to a number
-    const timestamp = parseInt(timestampString);
-
-    // Create a new Date object
-    const date = new Date(timestamp);
-
-    // Format the date
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
   console.log(ordersData);
   // Notifying the dispatched product
   const notify = (message) => {
@@ -227,6 +219,10 @@ function Checkout() {
     }
   };
 
+  // Calculate the total flower pocket charge
+  const totalFlowerPocketCharge = isItems.reduce((total, item) => {
+    return total + (item.flower_pocket === "true" ? 1200 : 0);
+  }, 0);
   return (
     <div className="px-3 md:px-10 py-5">
       <p className="font-bold text-2xl text-right ">: سلة الهدايا </p>
@@ -431,35 +427,47 @@ function Checkout() {
                 productImage={order.main_image}
                 price={`${order.price}`}
                 amount={`${order.quantity * order.price}`}
+                sender={order.sender}
+                flower_pocket={order.flower_pocket}
                 recipient={order.recipient}
                 quantity={order.quantity}
                 isCheckout={true}
               />
             ))}
           </div>
-
+          {/* Flower fee */}
           <div className="my-5 pt-5 border-t flex flex-col flex-nowrap space-y-5">
             <div className="flex flex-row flex-nowrap items-center w-full ">
-              <p>Sous-Total </p>
+              <p>
+                {totalFlowerPocketCharge} <span>DA</span>
+              </p>
               <p className="flex flex-grow"></p>
+              <p>باقة زهور </p>
+            </div>
+          </div>
+          {/* Delivery */}
+          <div className="my-5 pt-5 border-t flex flex-col flex-nowrap space-y-5">
+            <div className="flex flex-row flex-nowrap items-center w-full ">
               <p>
                 {subTotal} <span>DA</span>
               </p>
+              <p className="flex flex-grow"></p>
+              <p>المجموع الفرعي </p>
             </div>
             <div className="flex flex-row flex-nowrap items-center w-full ">
-              <p>Livraison</p>
-              <p className="flex flex-grow"></p>
               <p>
                 {items.length ? livraison : null} <span>DA</span>
               </p>
+              <p className="flex flex-grow"></p>
+              <p>تكاليف التوصيل</p>
             </div>
 
             <div className=" font-bold border-t pt-3 flex flex-row flex-nowrap items-center w-full ">
-              <p>Total </p>
-              <p className="flex flex-grow"></p>
               <p>
-                {items.length ? total : null} <span>DA</span>
+                <span>دج</span> {items.length ? total : null}
               </p>
+              <p className="flex flex-grow"></p>
+              <p>المجموع </p>
             </div>
             <div>
               <p className="text-xl font-semibold">Livraison | التوصيل</p>

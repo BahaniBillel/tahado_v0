@@ -121,12 +121,12 @@ input RemoveItemInput {
 
 input AddOrderItemInput {
   user_id: Int!
- 
+ sender:String
   product_id: Int!
   recipient:String   
   gifter_message:String
   quantity: Int!
-
+flower_pocket:Boolean
   price: Float! 
     
 }
@@ -203,8 +203,10 @@ input CraftmanInput {
     order_id: ID!
     user_id: Int
     order_date:String
-    recipient:String    
-    gifter_message:String     
+    sender: String
+    recipient: String
+    gifter_message: String
+    flower_pocket: Boolean   
     wished_gift_date: String    
     total_amount: Float
     orderitems: [OrderItem!]!
@@ -261,6 +263,15 @@ input CraftmanInput {
     product: Product!
     occasion: Occasion!
   }
+type Storytelling {
+  id: ID!
+  title: String!
+  description: String!
+  createdAt: String # DateTime represented as String
+  updatedAt: String # DateTime represented as String
+  # Add other fields as necessary, like characters, setting, plot, etc.
+  # Depending on their types, you might need to define new GraphQL types or use existing scalar types.
+}
 
   
 

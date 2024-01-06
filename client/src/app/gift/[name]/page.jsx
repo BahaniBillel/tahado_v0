@@ -7,9 +7,6 @@ import NewsletterRibbon from "../../../components/NewsletterRibbon";
 import BottomNavigation from "../../../components/BottomNavigation";
 import DynamicPageSkelton from "../../../components/DynamicPageSkelton";
 
-// APIs
-import { FetchGifts } from "../../api/giftsAPIs";
-
 // GraphQL
 import { useMutation, useQuery } from "@apollo/client";
 import { getClient } from "../../../app/lib/client";

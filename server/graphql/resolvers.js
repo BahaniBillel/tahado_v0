@@ -179,9 +179,9 @@ const resolvers = {
     },
 
     createGift: async (_, { giftData }, context) => {
-      if (!context.user || !context.user.roles.includes("admin")) {
-        throw new Error("Unauthorized");
-      }
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       const { category_id, occasionIds, ...giftDetails } = giftData;
       console.log(
         "createGift about to be sent to tables:",
@@ -313,9 +313,9 @@ const resolvers = {
     },
 
     createUser: async (_, { userDataInput }, context) => {
-      if (!context.user || !context.user.roles.includes("admin")) {
-        throw new Error("Unauthorized");
-      }
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       console.log(userDataInput);
 
       // Validate input
@@ -383,9 +383,9 @@ const resolvers = {
     },
 
     addInventory: async (_, { addInventoryInput }, context) => {
-      if (!context.user || !context.user.roles.includes("admin")) {
-        throw new Error("Unauthorized");
-      }
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       console.log("addInventoryResolver:", addInventoryInput);
       try {
         // Check if an inventory record with this product_id already exists
@@ -422,16 +422,16 @@ const resolvers = {
     addToOrder: async (_, { addToOrderInput }, context) => {
       const {
         user_id,
-
+        sender,
         product_id,
         recipient,
         gifter_message,
+        flower_pocket,
         quantity,
-
         price,
       } = addToOrderInput;
 
-      console.log(addToOrderInput);
+      console.log("addToOrderInput", addToOrderInput);
 
       try {
         // Check if the specified product exists
@@ -482,7 +482,9 @@ const resolvers = {
             user_id,
             order_date: new Date(),
             total_amount: quantity * price,
+            sender,
             recipient,
+            flower_pocket,
             gifter_message,
           },
         });
@@ -514,7 +516,7 @@ const resolvers = {
         });
         const reservedQuantity = reservedOrders[0]?._sum.quantity || 0;
 
-        console.log(reservedQuantity);
+        console.log("reservedQuantity", reservedQuantity);
         // TODO: implment check for the availability of the product
         // Update the inventory table
 

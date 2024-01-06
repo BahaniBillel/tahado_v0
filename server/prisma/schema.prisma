@@ -98,8 +98,10 @@ model orders {
   order_id         Int              @id @default(autoincrement())
   user_id          Int?
   order_date       DateTime?        @db.Date
+  sender           String?          @db.VarChar
   recipient        String?          @db.VarChar
   gifter_message   String?          @db.VarChar
+  flower_pocket    Boolean?         @db.Boolean
   wished_gift_date DateTime         @default(now())
   total_amount     Decimal?         @db.Decimal(10, 0)
   orderitems       orderitems[]
@@ -200,7 +202,11 @@ model DeliveryTime {
   @@index([delivery_option_id], name: "idx_delivery_time_delivery_option")
 }
 
-// model Storytelling{
-//   story_id   Int @id @default(autoincrement())
-
-// }
+model Storytelling {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // Add other fields as necessary, like `characters`, `setting`, `plot`, etc.
+}

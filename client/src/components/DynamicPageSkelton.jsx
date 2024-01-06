@@ -29,11 +29,13 @@ function DynamicPageSkelton({ data, giftId }) {
   // FETCHING IMAGES FROM AMAEZON S3
   const [images, setImages] = useState([]);
   const [giftImageMap, setGiftImageMap] = useState({}); // New state to map gift_ids to their images
+
+  const [flowerChoice, setFlowerChoice] = useState("with");
   const [open, setOpen] = React.useState(false); // For Yetanother lightbox
   const dispatch = useDispatch();
   const items = useSelector(selectItems);
 
-  console.log("itesm:", items);
+  console.log("items from DynamicPageSkelton:", items);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -62,10 +64,16 @@ function DynamicPageSkelton({ data, giftId }) {
   // console.log("logging from gift product", data);
 
   const formSchema = z.object({
+    sender: z
+      .string()
+      .min(1, "Sender is required")
+      .max(100, "Sender name too long"),
     recipient: z
       .string()
       .min(1, "Recipient is required")
       .max(100, "Recipient name too long"),
+    // with_flower: z.boolean(),
+    with_flower: z.union([z.literal("true"), z.literal("false")]),
     gifter_message: z.string().max(500, "Message is too long").optional(),
     quantity: z.number().min(1, "Quantity must be at least 1"),
   });
@@ -74,7 +82,6 @@ function DynamicPageSkelton({ data, giftId }) {
     register,
     handleSubmit,
     formState: { errors },
-    control,
     reset,
   } = useForm({
     resolver: zodResolver(formSchema),
@@ -82,13 +89,17 @@ function DynamicPageSkelton({ data, giftId }) {
   });
 
   const onSubmit = async (formData) => {
+    console.log("loging quantity before submitting :", formData.quantity);
+
     //  Dispatch product to redux store
     dispatch(
       addToBasket({
         product_id: parseInt(data.gift_id),
         giftname: data.giftname,
+        sender: formData.sender,
         recipient: formData.recipient,
         gifter_message: formData.gifter_message,
+        flower_pocket: formData.with_flower,
         quantity: parseInt(formData.quantity),
         price: data.price,
         main_image: data.main_image,
@@ -136,12 +147,12 @@ function DynamicPageSkelton({ data, giftId }) {
             <MdLocalOffer className="text-charcoal" />
           </div>
 
-          <label id="recipient">المتلقي</label>
+          <label id="sender">المرسل</label>
           <input
-            {...register("recipient")}
+            {...register("sender")}
             type="text"
-            name="recipient"
-            id="recipient"
+            name="sender"
+            id="sender"
             className="input"
           />
           <label id="gifter_message" className="text-right whitespace-pre">
@@ -154,7 +165,14 @@ function DynamicPageSkelton({ data, giftId }) {
             id="gifter_message"
             className="input"
           />
-
+          <label id="recipient">المهدى إليه</label>
+          <input
+            {...register("recipient")}
+            type="text"
+            name="recipient"
+            id="recipient"
+            className="input"
+          />
           <div className="flex flex-row space-x-3 w-full my-10 ">
             <select
               name="quantity"
@@ -178,6 +196,29 @@ function DynamicPageSkelton({ data, giftId }) {
               أضف إلى السلة
             </button>
           </div>
+          {/* Flower choices */}
+          <div>
+            <p> * الورد</p>
+            <div>
+              <label id="with_flower"> مع باقة الورد </label>
+              <input
+                {...register("with_flower")}
+                type="radio"
+                id="with_flower"
+                value="true" // String value
+              />
+            </div>
+            <div>
+              <label id="without_flower">بدون باقة ورد </label>
+              <input
+                {...register("with_flower")}
+                type="radio"
+                id="without_flower"
+                value="false" // String value
+              />
+            </div>
+          </div>
+
           <div className="flex flex-grow" />
           <div className="border-t pt-3 border-charcoal/40">
             <div>

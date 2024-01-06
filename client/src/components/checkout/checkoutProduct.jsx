@@ -22,7 +22,9 @@ import { useMutation, useQuery } from "@apollo/client";
 function CheckoutProduct({
   name,
   isCheckout,
+  sender,
   recipient,
+  flower_pocket,
   productImage,
   amount,
   price,
@@ -35,36 +37,6 @@ function CheckoutProduct({
   const [orderQuantity, setOrderQuantity] = useState(quantity);
   const [orderAmount, setOrderAmount] = useState(amount);
   const orderPrice = parseInt(price);
-
-  // console.log("orderQuantity", orderQuantity, orderAmount, amount);
-
-  // const increaseProduct = () => {
-  //   setOrderQuantity((prev) => {
-  //     const newQuantity = prev + 1;
-  //     setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
-  //     console.log(" logging prices parameters:", newQuantity, orderPrice);
-  //     // Dispatch action to increment quantity in Redux store
-  //     dispatch(incrementQuantity({ productId: productId, newQuantity, price }));
-
-  //     return newQuantity;
-  //   });
-  // };
-
-  // const decrementProduct = () => {
-  //   setOrderQuantity((prev) => {
-  //     if (prev > 1) {
-  //       // Ensure quantity doesn't go below 1
-  //       const newQuantity = prev - 1;
-  //       setOrderAmount(newQuantity * orderPrice); // Update amount based on new quantity
-
-  //       // Dispatch action to decrement quantity in Redux store
-  //       dispatch(decrementQuantity({ productId: productId, newQuantity }));
-
-  //       return newQuantity;
-  //     }
-  //     return prev;
-  //   });
-  // };
 
   const increaseProduct = () => {
     dispatch(incrementQuantity({ productId: productId, price }));
@@ -156,14 +128,23 @@ function CheckoutProduct({
         bg-white cursor-pointer
       hover:shadow-md rounded-sm "
     >
-      <div className="flex flex-col space-y-2 ">
-        <Image
-          src={productImage}
-          width={70}
-          height={70}
-          alt={name}
-          className="p-2"
-        />
+      <div className="col-span-1  flex flex-col items-end  ">
+        <div className="font-semibold text-sm whitespace-pre">{amount} DA</div>
+        <div className="flex flex-row space-x-3 items-center mt-5 whitespace-pre">
+          <button
+            className="bg-greenSecondary py-1 px-3 rounded-sm text-black hover:scale-95 transition-shadow duration-150"
+            onClick={decrementProduct}
+          >
+            -
+          </button>
+          <p>{quantity}</p>
+          <button
+            className="bg-greenPrimary py-1 px-3 rounded-sm text-black shadow-md hover:scale-95 transition-shadow duration-150"
+            onClick={increaseProduct}
+          >
+            +
+          </button>
+        </div>
         <div className="flex flex-grow"></div>
         <div
           className="flex flex-row rounded-md p-2  hover:border-greenSecondary
@@ -171,13 +152,12 @@ function CheckoutProduct({
          duration-150 ease-in-out group"
           onClick={() => removeItemFromBasket(productId)}
         >
-          <TrashIcon className="h-5 text-greenSecondary mr-1 group-hover:text-greenSecondary" />
-          <p className="text-greenSecondary text-sm tracking-wide group-hover:text-greenSecondary">
-            Supprimer
+          <p className="text-red text-sm tracking-wide group-hover:text-greenSecondary whitespace-pre">
+            إزالة من السلة
           </p>
+          <TrashIcon className="h-5 text-red mr-1 group-hover:text-greenSecondary" />
         </div>
       </div>
-
       {/* middle section */}
       <div className="col-span-3 mx-5 flex flex-col text-right">
         <p className="font-bold ">{name}</p>
@@ -196,25 +176,22 @@ function CheckoutProduct({
         <p className="font-light text-xs md:text-sm mt-2 line-clamp-3">
           {recipient}
         </p>
+        <p className="font-light text-xs md:text-sm mt-2 line-clamp-3">
+          {sender}
+        </p>
+        <p className="font-light text-xs md:text-sm mt-2 line-clamp-3">
+          {flower_pocket ? "with flower" : "without flower"}
+        </p>
       </div>
       {/* right section */}
-      <div className="col-span-1  flex flex-col items-end  ">
-        <div className="font-semibold text-sm whitespace-pre">{amount} DA</div>
-        <div className="flex flex-row space-x-3 items-center mt-5 whitespace-pre">
-          <button
-            className="bg-greenSecondary py-1 px-3 rounded-sm text-black hover:scale-95 transition-shadow duration-150"
-            onClick={decrementProduct}
-          >
-            -
-          </button>
-          <p>{quantity}</p>
-          <button
-            className="bg-greenPrimary py-1 px-3 rounded-sm text-black shadow-md hover:scale-95 transition-shadow duration-150"
-            onClick={increaseProduct}
-          >
-            +
-          </button>
-        </div>
+      <div className="flex flex-col space-y-2 items-end ">
+        <Image
+          src={productImage}
+          width={70}
+          height={70}
+          alt={name}
+          className="p-2"
+        />
       </div>
     </div>
   );
