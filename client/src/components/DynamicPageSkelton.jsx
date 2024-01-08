@@ -190,7 +190,7 @@ function DynamicPageSkelton({ data, giftId }) {
             <button
               type="submit"
               className="border px-6 py-1 rounded-sm text-sm font-light bg-charcoal
-             text-turquoise hover:text-coralPinkLight hover:bg-charcoal hover:border-charcoal
+             text-white hover:text-coralPinkLight hover:bg-charcoal hover:border-charcoal
              transition-all duration-150 ease-in-out whitespace-pre "
             >
               أضف إلى السلة
