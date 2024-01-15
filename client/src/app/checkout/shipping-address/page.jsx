@@ -35,6 +35,7 @@ function ShippingAdress() {
   const [deliveryOptionId, setDeliveryOptionId] = useState(0);
   const [isItems, setIsItems] = useState(items);
   const [total, setTotal] = useState(cart);
+  const [wilaya, setWilaya] = useState("");
 
   const formSchema = z.object({
     fullname: z.string().min(1, "Full name is required"),
@@ -53,6 +54,7 @@ function ShippingAdress() {
   const {
     handleSubmit,
     register,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: formValidationSchema,
@@ -148,6 +150,20 @@ function ShippingAdress() {
   const isAdmin = data?.user?.roles?.includes("admin");
 
   // Utility Functions
+
+  // Handle change in deliveryOption
+  const handleDeliveryOptionChange = (e) => {
+    const selectedCost = parseFloat(e.target.value);
+    const selectedOption = providersData.deliveryOptionsWithDetails.find(
+      (option) => option.total_cost === selectedCost
+    );
+    if (selectedOption) {
+      setDelivery(selectedOption.total_cost);
+      setDeliveryOptionId(selectedOption.delivery_option_id);
+      // Programmatically update the wilaya field
+      setValue("wilaya", selectedOption.city, { shouldValidate: true });
+    }
+  };
 
   const notify = (message) => {
     if (ordersData.orders.length === 0) {
@@ -360,22 +376,13 @@ function ShippingAdress() {
                 <label className="flex flex-grow"></label>
                 <label>خيارات التوصيل</label>
               </label>
+
               <select
                 {...register("deliveryOption", {
                   setValueAs: (value) => parseFloat(value),
                 })}
                 className="input w-full"
-                onChange={(e) => {
-                  // Update the total_cost state
-                  const selectedOption =
-                    providersData.deliveryOptionsWithDetails.find(
-                      (option) => option.total_cost === Number(e.target.value)
-                    );
-                  if (selectedOption) {
-                    setDelivery(selectedOption.total_cost);
-                    setDeliveryOptionId(selectedOption.delivery_option_id);
-                  }
-                }}
+                onChange={handleDeliveryOptionChange}
               >
                 <option value="">Select a provider</option>
                 {providersData.deliveryOptionsWithDetails.map(
@@ -424,16 +431,14 @@ function ShippingAdress() {
                   <label>ولاية</label>
                 </label>
                 <select
-                  id="wilaya"
                   {...register("wilaya")}
                   className="input w-full"
-                  required
+                  disabled // This field is disabled but part of the form submission
                 >
-                  <option value="">Select Your Wilaya</option>
                   {providersData.deliveryOptionsWithDetails.map(
                     (option, index) => (
                       <option key={index} value={option.city}>
-                        {` ${option.city} `}
+                        {option.city}
                       </option>
                     )
                   )}
