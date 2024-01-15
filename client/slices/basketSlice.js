@@ -4,6 +4,7 @@ const initialState = {
   items: [],
   likes: [],
   heart: [],
+  cart: [],
   lastVisitedUrl: null,
   lastLikedItem: null,
 };
@@ -14,7 +15,9 @@ export const basketSlice = createSlice({
   reducers: {
     addToBasket: (state, action) => {
       const itemExists = state.items.find(
-        (item) => item.product_id === action.payload.product_id
+        (item) =>
+          item.product_id === action.payload.product_id &&
+          item.recipient === action.payload.recipient
       );
       if (itemExists) {
         itemExists.quantity += 1;
@@ -27,11 +30,21 @@ export const basketSlice = createSlice({
 
       if (typeof window !== "undefined") {
         // Perform localStorage action
-
         localStorage.setItem("items", JSON.stringify(state.items));
       }
     },
-
+    receiveFromCart: (state, action) => {
+      const cartItemsExists = state.cart.find(
+        (item) =>
+          item.product_id === action.payload.product_id &&
+          item.recipient === action.payload.recipient
+      );
+      if (!cartItemsExists) {
+        state.cart = [...state.cart, { ...action.payload }];
+      } else {
+        return;
+      }
+    },
     incrementQuantity: (state, action) => {
       const { productId } = action.payload;
       const item = state.items.find((item) => item.product_id === productId);
@@ -40,7 +53,6 @@ export const basketSlice = createSlice({
         item.amount = item.quantity * item.price; // Calculate new amount
       }
     },
-
     decrementQuantity: (state, action) => {
       const { productId } = action.payload;
       const item = state.items.find((item) => item.product_id === productId);
@@ -75,11 +87,12 @@ export const basketSlice = createSlice({
     resetItems: (state) => {
       state.items = [];
     },
-
+    resetCart: (state) => {
+      state.cart = [];
+    },
     incrementLikes: (state, action) => {
       state.likes = [...state.likes, action.payload];
     },
-
     decrementLikes: (state, action) => {
       // find the item index inside the items basket
       const index = state.likes.findIndex(
@@ -103,7 +116,6 @@ export const basketSlice = createSlice({
 
       state.likes = newLikes;
     },
-
     toggleLike: (state, action) => {
       const productId = action.payload;
       const index = state.likes.indexOf(productId);
@@ -151,6 +163,7 @@ export const basketSlice = createSlice({
 
 export const {
   addToBasket,
+  receiveFromCart,
   removeFromBasket,
   incrementLikes,
   decrementLikes,
@@ -159,6 +172,7 @@ export const {
   incrementQuantity,
   decrementQuantity,
   resetItems,
+  resetCart,
   resetLikes,
   setLastVisitedUrl,
   setLastLikedItem,
@@ -167,6 +181,7 @@ export const {
 
 // this is  how we pull items from the global store
 export const selectItems = (state) => state.basket.items;
+export const selectCart = (state) => state.basket.cart;
 export const selectTotal = (state) =>
   state.basket.items.reduce((total, item) => total + parseFloat(item.price), 0);
 // Selector to get the last visited URL from the state

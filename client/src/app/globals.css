@@ -44,7 +44,7 @@ body {
     @apply flex flex-row   justify-end items-start;
   }
   .input {
-    @apply border border-charcoal/30 w-full rounded-sm py-1 outline-none focus:bg-lightGray text-right pr-1 text-sm font-light;
+    @apply border border-charcoal/30 w-full rounded-sm py-2 outline-none focus:bg-lightGray text-right pr-1 text-sm font-light;
   }
 
   .smalltitle {

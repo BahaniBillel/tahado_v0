@@ -1,11 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, Decimal } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 
 const resolvers = {
   Query: {
-    // orders: () => prisma.orders.findMany(),
-
     order: async (_, { user_id }) => {
       try {
         const orders = await prisma.orders.findMany({
@@ -25,13 +23,13 @@ const resolvers = {
         throw new Error("Error fetching orders. See console logs for details.");
       }
     },
-
     orders: () =>
       prisma.orders.findMany({
         include: {
           orderitems: true,
         },
       }),
+
     orderitems: () =>
       prisma.orderitems.findMany({
         include: {
@@ -93,16 +91,77 @@ const resolvers = {
         },
       });
     },
+
+    deliveryOptions: () =>
+      prisma.deliveryOptions
+        .findMany({
+          include: {
+            DeliveryPricing: true,
+            DeliveryTime: true,
+            orders: {
+              select: {
+                order_id: true,
+              },
+            },
+          },
+        })
+        .then((options) =>
+          options.map((option) => ({
+            ...option,
+            orders: option.orders || [],
+          }))
+        ),
+
+    deliveryOptionsWithDetails: async () => {
+      try {
+        const deliveryOptions = await prisma.deliveryOptions.findMany({
+          include: {
+            DeliveryPricing: true,
+            DeliveryTime: true,
+          },
+        });
+
+        return deliveryOptions.map((option) => {
+          // Calculate total cost
+          const total_cost = option.DeliveryPricing.reduce(
+            (acc, curr) => acc + curr.total_price,
+            0
+          );
+
+          // Calculate average estimated time
+          const estimated_time_sum = option.DeliveryTime.reduce(
+            (acc, curr) => acc + curr.estimated_time,
+            0
+          );
+          const estimated_time_count = option.DeliveryTime.length;
+          const estimated_time =
+            estimated_time_count > 0
+              ? Math.round(estimated_time_sum / estimated_time_count)
+              : 0;
+
+          return {
+            delivery_option_id: option.delivery_option_id,
+            provider_name: option.provider_name,
+            city: option.city,
+            total_cost: total_cost,
+            estimated_time: estimated_time,
+          };
+        });
+      } catch (error) {
+        console.error("Error fetching delivery options with details:", error);
+        throw new Error("Error fetching delivery options with details.");
+      }
+    },
   },
 
   Mutation: {
     createCraftman: async (_, { craftmanData }, context) => {
-      console.log("logging context from createCraftman", context);
-      console.log("lgging from mutation resolver", craftmanData);
+      // console.log("logging context from createCraftman", context);
+      // console.log("lgging from mutation resolver", craftmanData);
 
-      if (!context.user || !context.user.roles.includes("admin")) {
-        throw new Error("Unauthorized");
-      }
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       try {
         // Check if the craftman already exists based on the name
         const existingCraftman = await prisma.craftmen.findFirst({
@@ -128,9 +187,9 @@ const resolvers = {
 
     createOccasion: async (_, { occasionData }, context) => {
       console.log("logging from resolvers", occasionData);
-      if (!context.user || !context.user.roles.includes("admin")) {
-        throw new Error("Unauthorized");
-      }
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       try {
         const existingOccasion = await prisma.occasion.findFirst({
           where: { name: occasionData.name },
@@ -152,9 +211,9 @@ const resolvers = {
     },
 
     createCategory: async (_, { categoryData }, context) => {
-      if (!context.user || !context.user.roles.includes("admin")) {
-        throw new Error("Unauthorized");
-      }
+      // if (!context.user || !context.user.roles.includes("admin")) {
+      //   throw new Error("Unauthorized");
+      // }
       try {
         // Check if the category already exists based on the name
         const existingCategory = await prisma.categories.findFirst({
@@ -429,9 +488,20 @@ const resolvers = {
         flower_pocket,
         quantity,
         price,
+
+        address,
+        city,
+        commune,
+
+        extra_info,
+        email,
+        phone_number,
+
+        delivery_option_id,
       } = addToOrderInput;
 
       console.log("addToOrderInput", addToOrderInput);
+      const flower_pocket_fee = 1200;
 
       try {
         // Check if the specified product exists
@@ -475,20 +545,53 @@ const resolvers = {
             `This Order with reference ${existingOrder.order_id} already exists`
           );
         }
+        const findDeliveryProvider = await prisma.deliveryPricing.findFirst({
+          where: {
+            delivery_option_id,
+          },
+        });
 
+        if (!findDeliveryProvider) {
+          throw new Error(
+            `The provider for this oder # ${existingOrder.order_id} is not defined`
+          );
+        }
         // Add the product to the order
         const newOrder = await prisma.orders.create({
           data: {
             user_id,
             order_date: new Date(),
-            total_amount: quantity * price,
+            total_amount: flower_pocket
+              ? quantity * price + flower_pocket_fee
+              : quantity * price,
             sender,
             recipient,
             flower_pocket,
             gifter_message,
+            delivery_option_id,
+            delivery_price: findDeliveryProvider.total_price,
           },
         });
 
+        if (!newOrder.order_id) {
+          throw new Error(
+            `order_is is not yet  was not added to orders table `
+          );
+        }
+
+        const updatedNewOrder = await prisma.orders.update({
+          where: {
+            order_id: newOrder.order_id,
+            order_date: newOrder.order_date,
+            sender: newOrder.sender,
+          },
+
+          data: {
+            total_order_cost:
+              parseFloat(newOrder.total_amount) +
+              parseFloat(newOrder.delivery_price),
+          },
+        });
         if (!newOrder) {
           throw new Error("The new ordered was not added to orders table");
         }
@@ -520,9 +623,9 @@ const resolvers = {
         // TODO: implment check for the availability of the product
         // Update the inventory table
 
-        if (reservedQuantity >= existingInventory.available) {
-          throw new Error("Insufficient stock available for the product.");
-        }
+        // if (reservedQuantity >= existingInventory.available) {
+        //   throw new Error("Insufficient stock available for the product.");
+        // }
         const UpdateInventory = await prisma.inventory.update({
           where: {
             product_id,
@@ -534,10 +637,58 @@ const resolvers = {
           },
         });
 
+        // Update order_id in deliveryoptions
+        if (!newOrder.order_id) {
+          throw new Error("The order_id havn't yet been created");
+        }
+
+        const DeliveryTime = await prisma.deliveryTime.findFirst({
+          where: {
+            delivery_option_id,
+          },
+        });
+
+        const UpdateDeliveryOptions = await prisma.deliveryOptions.update({
+          where: {
+            delivery_option_id,
+          },
+
+          data: {
+            // order_id: newOrder.order_id,
+            delivery_time_id: DeliveryTime.delivery_time_id,
+          },
+        });
+        // Add shipping address
+        const AddshippingInfo = await prisma.shippingaddresses.create({
+          data: {
+            user_id,
+            address,
+            city,
+            commune,
+
+            extra_info,
+          },
+        });
+
+        // Update user email and phone_number
+
+        const UpdateUserInfo = await prisma.users.update({
+          where: {
+            user_id,
+          },
+
+          data: {
+            email,
+            phone_number,
+          },
+        });
         return {
-          order: newOrder,
+          order: updatedNewOrder,
           orderItem: newOrderItem,
           inventory: UpdateInventory,
+          shippingaddress: AddshippingInfo,
+          users: UpdateUserInfo,
+          delivery_option: UpdateDeliveryOptions,
         };
       } catch (error) {
         console.error("Error in addToOrder resolver:", error);
@@ -592,12 +743,107 @@ const resolvers = {
         return { success: false, message: "Error removing item from order" };
       }
     },
+    addDeliveryProvider: async (_, { deliveryDataInput }) => {
+      try {
+        // Check if a delivery option with the same provider_name and city already exists
+        const existingDeliveryOption = await prisma.deliveryOptions.findFirst({
+          where: {
+            provider_name: deliveryDataInput.provider_name,
+            city: deliveryDataInput.city,
+          },
+        });
+
+        // If an existing record is found, throw an error
+        if (existingDeliveryOption) {
+          throw new Error(
+            "A delivery provider with the same name and city already exists."
+          );
+        }
+        // Begin a transaction to ensure data consistency
+        const result = await prisma.$transaction(async (prisma) => {
+          // Create a new delivery option
+          const deliveryOption = await prisma.deliveryOptions.create({
+            data: {
+              provider_name: deliveryDataInput.provider_name,
+              city: deliveryDataInput.city,
+            },
+          });
+          // Calculate the total price by adding base price and additional cost
+          const totalPrice = new Decimal(deliveryDataInput.base_price).plus(
+            deliveryDataInput.additional_cost
+          );
+
+          // Create the delivery pricing with the calculated total price
+          const deliveryPricing = await prisma.deliveryPricing.create({
+            data: {
+              delivery_option_id: deliveryOption.delivery_option_id,
+              base_price: deliveryDataInput.base_price,
+              additional_cost: deliveryDataInput.additional_cost,
+              total_price: totalPrice.toNumber(),
+            },
+          });
+
+          // Create the delivery time
+          const deliveryTime = await prisma.deliveryTime.create({
+            data: {
+              delivery_option_id: deliveryOption.delivery_option_id,
+              estimated_time: deliveryDataInput.estimated_time,
+            },
+          });
+
+          // Return the combined data
+          return {
+            deliveryOption,
+            deliveryPricing,
+            deliveryTime,
+          };
+        });
+
+        // Format the result as per the GraphQL response type
+        const response = {
+          deliveryOptions: {
+            provider_name: result.deliveryOption.provider_name,
+            city: result.deliveryOption.city,
+          },
+          deliveryPricing: {
+            base_price: result.deliveryPricing.base_price,
+            additional_cost: result.deliveryPricing.additional_cost,
+            total_price: result.deliveryPricing.total_price,
+          },
+          deliveryTime: {
+            estimated_time: result.deliveryTime.estimated_time,
+          },
+        };
+
+        return response;
+      } catch (error) {
+        // Handle any errors
+        throw new Error("Failed to add delivery provider: " + error.message);
+      }
+    },
   },
   Order: {
     user: (parent) =>
       prisma.users.findUnique({ where: { user_id: parent.user_id } }),
     orderitems: (parent) =>
       prisma.orderitems.findMany({ where: { order_id: parent.order_id } }),
+    deliveryOption: (parent) => {
+      console.log(
+        "Order ID:",
+        parent.order_id,
+        "Delivery Option ID:",
+        parent.delivery_option_id
+      );
+      // Check if the order has a delivery_option_id
+      if (parent.delivery_option_id) {
+        return prisma.deliveryOptions.findUnique({
+          where: { delivery_option_id: parent.delivery_option_id },
+        });
+      } else {
+        // If there is no delivery_option_id, return null or an appropriate default
+        return null;
+      }
+    },
   },
   OrderItem: {
     product: (parent) =>

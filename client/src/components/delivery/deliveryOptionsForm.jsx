@@ -1,128 +1,192 @@
 "use client";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GraphQLClient } from "graphql-request";
 import { z } from "zod";
 import React from "react";
+import { toast } from "sonner";
 
 // Define the schema using Zod
-const schema = z.object({
-  provider_name: z.string().min(1, "Provider name is required"),
-  city: z.string().min(1, "City is required"),
-  delivery_time_id: z.number().optional(),
-  order_id: z.number().optional(),
-  // Add other fields as required based on your model
+const deliveryOptionSchema = z.object({
+  provider_name: z.string(),
+  city: z.string(),
+  base_price: z.number().min(0).nonnegative(),
+  additional_cost: z.number().min(0).nonnegative(),
+  estimated_time: z.number().min(0).nonnegative(),
+  // Keep the delivery_option_id if needed
 });
 
-// Component
-const DeliveryOptionsForm = () => {
+const DeliveryOptionForm = () => {
   const {
     register,
     handleSubmit,
-    control,
+    reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(deliveryOptionSchema),
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
-    // Handle form submission
+  const addDeliveryProvider = async (deliveryDataInput) => {
+    const client = new GraphQLClient("http://localhost:3001/graphql");
+
+    const mutation = `mutation AddDeliveryProvider($deliveryDataInput: DeliveryDataInput!) {
+  addDeliveryProvider(deliveryDataInput: $deliveryDataInput) {
+    deliveryOptions {
+    
+      provider_name
+      city
+    }
+    deliveryPricing {
+      base_price
+      additional_cost
+  
+    }
+    deliveryTime {
+      estimated_time
+    }
+  }
+  }`;
+
+    try {
+      const data = await client.request(mutation, {
+        deliveryDataInput,
+      });
+
+      // console.log("Gift created successfully:", data.createGift);
+      toast.success("Provider_name and city created successfully");
+      return data;
+    } catch (error) {
+      onsole.error("Error creating gift:", error);
+      toast.error("Something went wrong while creating the gift");
+    }
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await addDeliveryProvider(data);
+      console.log(response);
+      // Handle success
+      toast.success(`${data.city} was successfully added to the database`);
+      reset();
+    } catch (error) {
+      console.error(error);
+      // Handle error
+    }
   };
 
   return (
-    <div
-      className="flex justify-center items-start flex-col h-screen bg-gray-100 
-    max-w-xl w-full  mx-auto p-6 bg-white rounded shadow"
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="max-w-lg mx-auto my-10 p-8 bg-white shadow-lg rounded"
     >
-      <h1 className="text-2xl text-charcoal font-bold mb-1">
-        <span className="text-turquoise ">First Page : </span>
-        Delivery Form Options.
-      </h1>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className=" "
-        style={{ minWidth: "500px" }}
-      >
-        {/* provider name */}
-        <div className="mb-4">
-          <label
-            htmlFor="provider_name"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Provider Name:
-          </label>
-          <input
-            id="provider_name"
-            {...register("provider_name")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-          {errors.provider_name && (
-            <p className="text-red-500 text-xs italic">
-              {errors.provider_name.message}
-            </p>
-          )}
-        </div>
-
-        {/* city */}
-
-        <div className="mb-4">
-          <label
-            htmlFor="city"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            City:
-          </label>
-          <input
-            id="city"
-            {...register("city")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-charcoal leading-tight focus:outline-none focus:shadow-outline"
-          />
-          {errors.city && <p>{errors.city.message}</p>}
-        </div>
-
-        {/* Delivery time id */}
-        <div className="mb-4">
-          <label
-            htmlFor="delivery_time_id"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Delivery Time ID:
-          </label>
-          <input
-            type="number"
-            id="delivery_time_id"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            {...register("delivery_time_id")}
-          />
-          {errors.delivery_time_id && <p>{errors.delivery_time_id.message}</p>}
-        </div>
-
-        {/* order id */}
-        <div className="mb-4">
-          <label
-            htmlFor="order_id"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            Order ID:
-          </label>
-          <input
-            type="number"
-            id="order_id"
-            {...register("order_id")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-charcoal leading-tight focus:outline-none focus:shadow-outline"
-          />
-          {errors.order_id && <p>{errors.order_id.message}</p>}
-        </div>
-
-        <button
-          type="submit"
-          className="bg-turquoise hover:bg-magenta text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      <h1 className="text-2xl font-semibold my-2">ADD NEW DELIVERY PROVIDER</h1>
+      {/* Provider name */}
+      <div className="mb-4">
+        <label
+          htmlFor="provider_name"
+          className="block text-gray-700 text-sm font-bold mb-2"
         >
-          Submit
-        </button>
-      </form>
-    </div>
+          Provider Name
+        </label>
+        <input
+          id="provider_name"
+          type="text"
+          {...register("provider_name")}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+        {errors.provider_name && (
+          <p className="text-red-500 text-xs italic">
+            {errors.provider_name.message}
+          </p>
+        )}
+      </div>
+
+      {/* city */}
+      <div className="mb-4">
+        <label
+          htmlFor="provider_name"
+          className="block text-gray-700 text-sm font-bold mb-2"
+        >
+          City
+        </label>
+        <input
+          id="city"
+          type="text"
+          {...register("city")}
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+        {errors.city && (
+          <p className="text-red-500 text-xs italic">{errors.city.message}</p>
+        )}
+      </div>
+
+      {/* estimated time */}
+
+      <div className="mb-4">
+        <label
+          htmlFor="estimated_time"
+          className="block text-gray-700 text-sm font-bold mb-2"
+        >
+          Estimated Time
+        </label>
+
+        <input
+          type="number"
+          {...register("estimated_time", {
+            setValueAs: (value) => parseFloat(value),
+          })}
+          className="w-full p-2 border rounded"
+        />
+        {errors.estimated_time && (
+          <p className="text-red-500 text-xs italic">
+            {errors.estimated_time.message}
+          </p>
+        )}
+      </div>
+
+      {/* base price */}
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Base price
+        </label>
+        <input
+          type="number"
+          {...register("base_price", {
+            setValueAs: (value) => parseFloat(value),
+          })}
+          className="w-full p-2 border rounded"
+        />
+        {errors.base_price && (
+          <p className="text-red-500">{errors.base_price.message}</p>
+        )}
+      </div>
+
+      {/* >Additional costs */}
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Additional cost{" "}
+        </label>
+        <input
+          type="number"
+          {...register("additional_cost", {
+            setValueAs: (value) => parseFloat(value),
+          })}
+          className="w-full p-2 border rounded"
+        />
+        {errors.additional_cost && (
+          <p className="text-red-500">{errors.additional_cost.message}</p>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        className="bg-turquoise hover:bg-lightmagenta text-white font-bold 
+        py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
+      >
+        Submit
+      </button>
+    </form>
   );
 };
 
-export default DeliveryOptionsForm;
+export default DeliveryOptionForm;

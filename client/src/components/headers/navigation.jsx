@@ -82,7 +82,7 @@ function Navigation({ url }) {
               <li className="md:midLink hidden relative "></li>
 
               <li className="midLink relative">
-                <Link href={`/checkout`}>
+                <Link href={`/checkout/cart`}>
                   <IoIosBasket className="text-black h-10 cursor-pointer " />
                   <span className=" absolute -top-1 left-1/4 text-white text-xs font-bold   z-10  bg-red py-1 px-2 rounded-full">
                     {isItems ? isItems?.length : 0}

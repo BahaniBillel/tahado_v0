@@ -16,6 +16,8 @@ const typeDefs = `#graphql
     occasions: [Occasion!]!
     productOccasion(productId: Int!): [ProductOccasion!]!
     wishlistByUser(userId: Int!): [Wishlist!]!
+    deliveryOptions:[DeliveryOptions!]!
+     deliveryOptionsWithDetails: [DeliveryOptionsWithDetails!]!
   }
 
  
@@ -46,9 +48,9 @@ const typeDefs = `#graphql
     user_id: Int
     address: String
     city: String
-    state: String
+    commune: String
     postal_code: String
-    country: String
+    extra_info: String
     user: User
   }
 
@@ -109,13 +111,34 @@ const typeDefs = `#graphql
   createWishItem(wishData:WishInput!):WishlistProductResponse!
   removeFromWishList(wishlistRemoveData: WishlistRemoveInput!): WishlistItem!
   createUser(userDataInput:UserDataInput!):User!
-addInventory(addInventoryInput:AddInventoryInput!):Inventory!
-   addToOrder(addToOrderInput: AddOrderItemInput!): AddOrderItemResponse!
-   removeItem(removeItemInput:RemoveItemInput!):AddOrderItemResponse!
+  addInventory(addInventoryInput:AddInventoryInput!):Inventory!
+  addToOrder(addToOrderInput: AddOrderItemInput!): AddOrderItemResponse!
+  removeItem(removeItemInput:RemoveItemInput!):AddOrderItemResponse!
+  addDeliveryProvider(deliveryDataInput:DeliveryDataInput!):DeliveryResponse!
+}
+ type DeliveryOptionsWithDetails {
+    provider_name: String!
+    city: String!
+    total_cost: Float!
+    estimated_time: Int!
+    delivery_option_id:Int!
+  }
+
+type DeliveryResponse {
+  deliveryPricing:DeliveryPricing
+  deliveryOptions:DeliveryOptions
+  deliveryTime:DeliveryTime
+}
+
+input DeliveryDataInput {
+  provider_name:String
+  city:String
+  base_price:Float!
+  additional_cost:Float!
+  estimated_time:Int!
 }
 
 input RemoveItemInput {
- 
    order_id: ID!
 }
 
@@ -126,14 +149,30 @@ input AddOrderItemInput {
   recipient:String   
   gifter_message:String
   quantity: Int!
-flower_pocket:Boolean
+  flower_pocket:Boolean
   price: Float! 
-    
+
+  # from shippingaddress table
+  address:String!
+  city: String!
+  commune: String!
+ 
+  extra_info: String
+
+  # for updating user email and phone number
+  email: String
+  phone_number: String!
+
+  # DeliveryOptions
+  delivery_option_id: Int!
+
 }
 
 type AddOrderItemResponse {
   order: Order
   orderItem: OrderItem
+  shippingaddress:ShippingAddress
+  delivery_option:DeliveryOptions
 }
 
 input AddInventoryInput{
@@ -199,19 +238,22 @@ input CraftmanInput {
     # Add other fields as needed
   }
 
-   type Order {
-    order_id: ID!
-    user_id: Int
-    order_date:String
-    sender: String
-    recipient: String
-    gifter_message: String
-    flower_pocket: Boolean   
-    wished_gift_date: String    
-    total_amount: Float
-    orderitems: [OrderItem!]!
-    user: User
-  }
+
+type Order {
+  order_id: ID!
+  user_id: Int
+  order_date: String
+  sender: String
+  recipient: String
+  gifter_message: String
+  flower_pocket: Boolean   
+  wished_gift_date: String    
+  total_amount: Float
+  orderitems: [OrderItem!]!
+  user: User
+  deliveryOption: DeliveryOptions  # Link to DeliveryOptions
+}
+
 
   type OrderItem {
     item_id: ID!
@@ -263,15 +305,50 @@ input CraftmanInput {
     product: Product!
     occasion: Occasion!
   }
+
+type DeliveryOptions {
+  delivery_option_id: Int!
+  provider_name: String!
+  city: String!
+  delivery_time_id: Int
+  orders: [Order]      # Updated to reflect one-to-many relationship
+  DeliveryPricing: [DeliveryPricing!]!
+  DeliveryTime: [DeliveryTime!]!
+}
+ 
+
+type DeliveryPricing {
+  pricing_id: Int!
+  delivery_option_id: Int!
+  base_price: Float!
+  additional_cost: Float!
+  total_price: Float!
+  deliveryOptions: DeliveryOptions!
+}
+
+type DeliveryTime {
+  delivery_time_id: Int!
+  delivery_option_id: Int!
+  estimated_time: Int!
+  deliveryOptions: DeliveryOptions!
+}
+
 type Storytelling {
   id: ID!
   title: String!
-  description: String!
-  createdAt: String # DateTime represented as String
-  updatedAt: String # DateTime represented as String
-  # Add other fields as necessary, like characters, setting, plot, etc.
-  # Depending on their types, you might need to define new GraphQL types or use existing scalar types.
+  description:String!
+  characters:String!
+  setting:String!
+  plot:String!
+  createdAt: String!
+  updatedAt: String!
+  
 }
+
+
+
+
+
 
   
 

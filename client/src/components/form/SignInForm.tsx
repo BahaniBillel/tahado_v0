@@ -58,7 +58,9 @@ const SignInForm = () => {
 
   // GraphQL Query to get users data
 
-  const { data: usersData, refetch: refetchUsers } = useQuery(GET_USERS);
+  const { data: usersData, refetch: refetchUsers } = useQuery(GET_USERS, {
+    pollInterval: 500,
+  });
   console.log(usersData);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -135,7 +137,7 @@ const SignInForm = () => {
     if (signInData?.error) {
       console.log(signInData.error);
     } else {
-      if (lastVisitedUrl === "/checkout") {
+      if (lastVisitedUrl === "/checkout/cart") {
         router.push(lastVisitedUrl);
         dispatch(clearLastVisitedUrl());
       } else {

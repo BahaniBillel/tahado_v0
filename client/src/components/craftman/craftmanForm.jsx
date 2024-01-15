@@ -2,10 +2,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { GraphQLClient } from "graphql-request"; // Import GraphQLClient
 // import { CreateCraftmanAPI } from "../../app/api/craftmenAPIs"; // Update with the correct path
 import { CREATE_CRAFTSMAN } from "../../graphql/mutations";
 import { useMutation, gql } from "@apollo/client";
-import { GraphQLClient } from "graphql-request"; // Import GraphQLClient
 
 import { toast } from "sonner";
 // Your Zod validation schema

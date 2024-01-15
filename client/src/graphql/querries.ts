@@ -203,3 +203,15 @@ export const GET_PRICE_LIST = gql`
     }
   }
 `;
+
+export const GET_PROVIDERS = gql`
+  query DeliveryOptionsWithDetails {
+    deliveryOptionsWithDetails {
+      delivery_option_id
+      provider_name
+      total_cost
+      estimated_time
+      city
+    }
+  }
+`;

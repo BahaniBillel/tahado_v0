@@ -78,6 +78,12 @@ const Sidebar = () => {
       >
         Orders Management
       </Link>
+      <Link
+        className="bg-white  text-charcoal px-4 py-2  mb-2 hover:bg-lightGray duration-150 ease-in-out whitespace-pre"
+        href={"/admin/deliveryboard"}
+      >
+        Delivery Managment
+      </Link>
 
       {/* Users link with dropdown */}
       <div
@@ -87,9 +93,9 @@ const Sidebar = () => {
       >
         <a
           className="bg-white  text-charcoal px-4 py-2 
-        mb-2 cursor-pointer  hover:bg-lightGray duration-150 ease-in-out"
+        mb-2 cursor-pointer  hover:bg-lightGray duration-150 ease-in-out w-full"
         >
-          users
+          User Management
         </a>
         <CSSTransition
           in={isUsersDropdownOpen}
