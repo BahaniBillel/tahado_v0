@@ -54,7 +54,7 @@ function BottomNavigationBar() {
         <MdOutlineLocalOffer className="h-6 w-6" />
         <p className="text-gray-600">Offers</p>
       </div>
-      <Link href="/cart">
+      <Link href={`/checkout/cart`}>
         <div className="flex flex-col text-xs font-light items-center justify-center cursor-pointer">
           <HiOutlineShoppingBag className="h-6 w-6" />
           <p className="text-gray-600 relative">
@@ -77,7 +77,7 @@ function BottomNavigationBar() {
         </div>
       </Link>
 
-      <Link href="/likes">
+      <Link href={`/wishlist`}>
         <div className="flex flex-col text-xs font-light items-center justify-center cursor-pointer ">
           <BsHeart className="h-6 w-6" />
 

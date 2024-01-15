@@ -8,7 +8,7 @@ function MiddleHeader() {
   return (
     <div className="  w-screen  md:px-20 flex flex-col justify-center items-center  space-y-12 place-items-center mt-10  ">
       <div className="row-span-1 w-full  px-10  ">
-        <p className="hidden md:block text-5xl text-center  w-full whitespace-pre ">
+        <p className="text-xl md:text-5xl text-center  w-full  ">
           اكتشف هدايا فريدة و منسقة لجميع مناسباتك
         </p>
       </div>

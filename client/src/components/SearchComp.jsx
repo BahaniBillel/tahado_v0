@@ -84,7 +84,7 @@ const SearchComp = () => {
             type="text"
             value={searchQuery}
             className="border border-lightGray w-full outline-none bg-gray-100 rounded-full 
-          text-right pr-3 py-2 focus:bg-lightGray/50  "
+          text-right py-2 focus:bg-lightGray/50  "
             placeholder=" ...ابحث عن هدية "
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}

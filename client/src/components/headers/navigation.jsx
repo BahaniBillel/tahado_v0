@@ -7,6 +7,7 @@ import {
   RiMenuLine,
   RiUser2Fill,
 } from "react-icons/ri";
+import { CgMenuRightAlt } from "react-icons/cg";
 import { IoIosBasket } from "react-icons/io";
 import Link from "next/link";
 import Logo from "../../../public/images/logo-new.png";
@@ -59,14 +60,17 @@ function Navigation({ url }) {
 
   console.log("last_name", firstName);
   return (
-    <div className="text-right bg-white">
-      <div className="grid grid-cols-3  md:grid-cols-3 w-full place-items-center md:px-20  border-b border-b-charcoal/20">
+    <div className="text-right bg-white relative ">
+      <div
+        className="grid grid-cols-6  md:grid-cols-3 
+      w-full place-items-center md:px-20 py-5  border-b border-b-charcoal/20"
+      >
         {/* Search comp */}
-        <div className="  col-span-1 w-full relative  ">
+        <div className=" order-2 md:order-1 col-start-2 col-span-4 md:col-span-1  w-full relative pr-5  ">
           <SearchComp />
         </div>
-        {/* The image */}
-        <div className="col-span-1 ">
+        {/* The image for medium view */}
+        <div className=" hidden md:block order-1 md:order-2 col-span-1 ">
           <Link href="/">
             {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
             TAHADO
@@ -74,9 +78,18 @@ function Navigation({ url }) {
             <Image src={Logo} height={150} />
           </Link>
         </div>
+        {/* Image for small view */}
+        <div className="md:hidden order-1 md:order-2 col-start-1 col-span-1 ">
+          <Link href="/">
+            {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
+            TAHADO
+          </p> */}
+            <Image src={Logo} height={50} />
+          </Link>
+        </div>
 
         {/* Buttons */}
-        <div className=" hidden col-span-1  md:flex flex-row items-center  ">
+        <div className=" hidden col-span-1  md:flex flex-row items-center order-3  ">
           <ul className=" col-span-1 place-self-end w-full">
             <ul className=" flex flex-row space-x-5 ">
               <li className="md:midLink hidden relative "></li>
@@ -122,6 +135,9 @@ function Navigation({ url }) {
             </ul>
           </ul>
         </div>
+        <div className=" col-start-6  col-span-1 block md:hidden order-3 ">
+          <CgMenuRightAlt className="text-charcoal h-8  w-8 cursor-pointer " />
+        </div>
       </div>
       <div
         className="h-8 bg-lightPink text-charcoal 
@@ -132,9 +148,6 @@ function Navigation({ url }) {
           @ تهادو تحابو
         </p>
         <p className="col-span-1">socials links</p>
-      </div>
-      <div className="col-span-1 block md:hidden ">
-        <RiMenuLine className="text-black h-10 cursor-pointer " />
       </div>
     </div>
   );
