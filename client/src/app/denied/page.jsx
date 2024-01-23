@@ -23,7 +23,9 @@ export default function AccessDenied() {
           <Image src={ThankYouImage} objectFit="cover" alt="thankyou image" />
         </div>
 
-        <h1 className="text-2xl font-bold mb-4">You Can't Access This Page!</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          You Can`&apos;`t Access This Page!
+        </h1>
         <p className="text-gray-700 mb-4">Your will be redirect it shorlty</p>
         <p className="text-sm text-gray-500">
           Redirecting to home in 2 seconds...

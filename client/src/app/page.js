@@ -4,6 +4,7 @@ import SectionLayout02 from "../components/layouts/SectionLayout02";
 import SectionLayout03 from "../components/layouts/SectionLayout03";
 import SectionLayout04 from "../components/layouts/SectionLayout04";
 import Example from "../components/example";
+import v8 from "v8";
 
 // Apollo Client for linking backend graphQL
 
@@ -46,6 +47,7 @@ export default async function Home() {
   );
 
   console.log(productOccasionData.products.length);
+
   return (
     <main className=" relative ">
       <HeroImage01 />

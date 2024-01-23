@@ -26,7 +26,19 @@
     "**/*.tsx",
     "src/app/sign-in/page.jsx",
     "src/components/form/addNewGiftForm.jsx",
-    "src/app/api/auth/[...nextauth]/options.jsx"
+    "src/app/api/auth/[...nextauth]/options.jsx",
+    "src/app/admin/addcategory/page.jsx",
+    "src/app/admin/addoccasion/page.jsx",
+    "src/app/admin/addgift/inventory_info/[gid]/page.jsx",
+    "src/app/admin/addgift/initial_info/page.jsx",
+    "src/app/admin/addcraftman/page.jsx",
+    "src/app/admin/orders/page.jsx",
+    "src/components/admin/dashboard.jsx",
+    "src/app/admin/layout.jsx",
+    "src/components/form/SignInForm.jsx",
+    "src/components/form/SignInForm.jsx",
+    "src/components/form/SignUpForm.jsx",
+    "src/components/form/SignInForm.jsx"
   ],
   "exclude": ["node_modules"]
 }

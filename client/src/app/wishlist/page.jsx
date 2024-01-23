@@ -12,7 +12,7 @@ export default function Wishlist() {
   const { data: sessionData, status } = useSession();
   const [wishlist, setWishlist] = useState([]);
 
-  const userId = parseInt(sessionData?.user?.user_id);
+  const userId = parseInt(sessionData?.user?.id);
 
   if (!userId) {
     redirect("api/auth/signin?callbackUrl=/sever");

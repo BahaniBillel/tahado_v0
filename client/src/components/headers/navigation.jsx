@@ -56,9 +56,9 @@ function Navigation({ url }) {
 
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
-  const userID = parseInt(data?.user?.user_id);
+  const userID = parseInt(data?.user?.id);
 
-  console.log("last_name", firstName);
+  console.log("last_name form navigation", firstName);
   return (
     <div className="text-right bg-white relative ">
       <div
@@ -75,7 +75,7 @@ function Navigation({ url }) {
             {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
             TAHADO
           </p> */}
-            <Image src={Logo} height={150} />
+            <Image src={Logo} height={150} alt="simyah" />
           </Link>
         </div>
         {/* Image for small view */}
@@ -84,7 +84,7 @@ function Navigation({ url }) {
             {/* <p className="text-2xl font-sans font-extrabold tracking-wide">
             TAHADO
           </p> */}
-            <Image src={Logo} height={50} />
+            <Image src={Logo} height={50} alt="simyah" />
           </Link>
         </div>
 

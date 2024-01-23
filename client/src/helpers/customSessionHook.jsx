@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 
 export const useCustomSession = () => {
   const { data, status } = useSession();
-  const userId = data?.user?.user_id;
+  const userId = data?.user?.id;
 
   return {
     userId,

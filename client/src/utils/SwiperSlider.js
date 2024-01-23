@@ -28,7 +28,7 @@ export const SwiperSlider = ({ data }) => {
       pagination="true"
     >
       {data.map((image, index) => (
-        <swiper-slide className="relative">
+        <swiper-slide className="relative" key={index}>
           <Image
             src={image || DefaultImage}
             alt={`Slide ${index + 1}`}

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-
+import Image from "next/image";
 export default function ImageMagnifier({ src }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -14,11 +14,12 @@ export default function ImageMagnifier({ src }) {
 
   return (
     <div className="relative">
-      <img
+      <Image
         src={src}
         alt="Product"
         className="cursor-crosshair w-full"
         onMouseMove={handleMouseMove}
+        fill
       />
       <div
         className="absolute inset-0 bg-cover bg-no-repeat bg-center"

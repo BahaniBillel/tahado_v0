@@ -11,15 +11,13 @@ function SearchPage() {
 
   console.log("logging query:", search);
 
-  if (!search) {
-    return <p>Please enter a search query.</p>; // Handle empty query
-  }
-
   useEffect(() => {
-    if (search) {
-      setSearchTerm(search);
+    // Moved inside useEffect
+    if (!search) {
+      return; // If there's no search term, we don't do anything
     }
-  }, [search]);
+    setSearchTerm(search);
+  }, [search]); // Dependency array ensures this runs when 'search' changes
 
   const { data, loading, error } = useQuery(GET_SEARCH_PRODUCTS, {
     variables: { query: searchTerm },

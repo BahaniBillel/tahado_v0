@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MakeUserAdminAPI } from "../../app/api/usersAPIs";
+
 import { toast } from "react-toastify";
 
 // Define a schema for the form using zod

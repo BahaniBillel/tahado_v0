@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { CreateUserAPI } from "../../app/api/usersAPIs";
+
 import { useRouter } from "next/navigation";
 import { z, ZodError } from "zod";
 import GoogleSignInButton from "../GoogleSignInButton";
@@ -19,6 +19,15 @@ const userSchema = z.object({
   last_name: z.string().optional(),
 });
 
+interface CreateUserResponse {
+  createUser: {
+    phone_number: string;
+    password_hash: string;
+    first_name?: string;
+    last_name?: string;
+  };
+}
+
 const RegisterForm = () => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
@@ -32,6 +41,31 @@ const RegisterForm = () => {
   };
 
   // Graphql Implementations
+
+  // const createUser = async (userDataInput) => {
+  //   const client = new GraphQLClient("http://localhost:3001/graphql");
+  //   const mutation = gql`
+  //     mutation Mutation($userDataInput: UserDataInput!) {
+  //       createUser(userDataInput: $userDataInput) {
+  //         phone_number
+  //         password_hash
+  //         first_name
+  //         last_name
+  //       }
+  //     }
+  //   `;
+
+  //   try {
+  //     const data = await client.request(mutation, { userDataInput });
+  //     console.log("user created successfully:");
+  //     toast.success("user created successfully");
+  //     return data.createUser; // Return the created user data
+  //   } catch (error) {
+  //     console.error("Error creating user:", error);
+  //     toast.error("Something went wrong while creating the user");
+  //     throw error; // Rethrow the error to handle it in handleSubmit
+  //   }
+  // };
 
   const createUser = async (userDataInput) => {
     const client = new GraphQLClient("http://localhost:3001/graphql");
@@ -47,14 +81,16 @@ const RegisterForm = () => {
     `;
 
     try {
-      const data = await client.request(mutation, { userDataInput });
-      console.log("user created successfully:", data.createUser);
+      const data = await client.request<CreateUserResponse>(mutation, {
+        userDataInput,
+      });
+      console.log("user created successfully:");
       toast.success("user created successfully");
-      return data.createUser; // Return the created user data
+      return data.createUser;
     } catch (error) {
       console.error("Error creating user:", error);
       toast.error("Something went wrong while creating the user");
-      throw error; // Rethrow the error to handle it in handleSubmit
+      throw error;
     }
   };
 

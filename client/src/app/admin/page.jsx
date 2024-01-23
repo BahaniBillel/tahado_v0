@@ -1,9 +1,8 @@
 import { getServerSession } from "next-auth";
 import React from "react";
 import { options } from "../api/auth/[...nextauth]/options";
-import Dashboard from "../../components/admin/dashboard";
-import AddNewGiftForm from "../../components/form/addNewGiftForm";
-const Admin = async ({ req }) => {
+
+const Admin = async () => {
   const session = await getServerSession(options);
 
   console.log(session.user.email);

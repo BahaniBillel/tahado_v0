@@ -61,45 +61,6 @@ function Cart() {
 
   // const total = Number(subTotal);
 
-  const addToOrder = async (addToOrderInput) => {
-    const client = new GraphQLClient("http://localhost:3001/graphql");
-    const mutation = `
-      mutation AddToOrder($addToOrderInput: AddOrderItemInput!) {
-        addToOrder(addToOrderInput: $addToOrderInput) {
-          order {
-            user_id
-            order_date
-            sender
-            flower_pocket
-            recipient
-            gifter_message
-          
-          }
-          orderItem {
-            product_id
-            quantity
-            product {
-              price
-            }
-          }
-        }
-      }
-    `;
-
-    try {
-      const response = await client.request(
-        mutation,
-
-        {
-          addToOrderInput: addToOrderInput,
-        }
-      );
-      console.log("Order Response:", response);
-    } catch (error) {
-      console.error("Order Submission Error:", error);
-    }
-  };
-
   const SubmitOrderToDatabase = async (e) => {
     e.preventDefault();
 
@@ -155,7 +116,7 @@ function Cart() {
 
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
-  const userID = parseInt(data?.user?.user_id);
+  const userID = parseInt(data?.user?.id);
   const role = data?.user?.roles[0];
   // Checking if the user is admin
   const isAdmin = data?.user?.roles?.includes("admin");

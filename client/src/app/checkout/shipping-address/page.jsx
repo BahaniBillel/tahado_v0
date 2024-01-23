@@ -145,7 +145,7 @@ function ShippingAdress() {
   const { data, status } = useSession();
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
-  const userID = parseInt(data?.user?.user_id);
+  const userID = parseInt(data?.user?.id);
   const role = data?.user?.roles[0];
   const isAdmin = data?.user?.roles?.includes("admin");
 
@@ -275,7 +275,7 @@ function ShippingAdress() {
       // Only reset the items if the order submission is successful
       dispatch(resetItems());
 
-      // router.push("/checkout/thanks");
+      router.push("/checkout/thanks");
     } catch (error) {
       console.error("Order Submission Error:", error);
       // Handle submission error

@@ -27,9 +27,9 @@ export default function UserDropDownMenu({ first_name, last_name }) {
 
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
-  const userID = parseInt(data?.user?.user_id);
+  const userID = parseInt(data?.user?.id);
   const role = data?.user?.roles[0];
-  console.log("role", role);
+  console.log("role from userdropdown", role);
   return (
     <div className="  text-right z-40">
       <Menu as="div" className="relative inline-block text-left border-none">

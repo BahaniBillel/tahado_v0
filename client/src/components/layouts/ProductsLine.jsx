@@ -12,7 +12,6 @@ import FadeTransition from "../transitionsComps/FadeTransition";
 // Helpers
 import { getImages, s3Client } from "../../helpers/s3Helpers";
 import { useCustomSession } from "../../helpers/customSessionHook";
-import { GetAllWishlist } from "../../app/api/wishlistAPIs";
 
 const ProductsLine = ({
   lineID,
@@ -117,7 +116,7 @@ const ProductsLine = ({
                 const mainImage = giftImages[0] || DefaultImage; // Use the first image or a default
                 const secondImage = giftImages[1] || DefaultImage; // Use the first image or a default
                 return (
-                  <FadeTransition in={show}>
+                  <FadeTransition in={show} key={gift.gift_id}>
                     <div
                       className="keen-slider__slide py-5 "
                       key={gift.gift_id}

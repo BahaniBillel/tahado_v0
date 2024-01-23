@@ -1,6 +1,6 @@
 import React from "react";
 import OccasionForm from "../../../components/occasion/occasionForm";
-import { getClient } from "../../../app/lib/client";
+import { getClient } from "../../lib/client";
 import { GET_OCCASIONS } from "../../../graphql/querries";
 
 async function AddOccasion() {
@@ -28,11 +28,11 @@ async function AddOccasion() {
       </div>
       <div className="flex flex-col items-start w-1/4 h-full py-4 px-8 bg-lightGray ">
         <p className="font-bold">The Available Occasions :</p>
-        {occasionsData.occasions.map((occasion) => (
-          <ul className="list list-disc">
+        <ul className="list list-disc">
+          {occasionsData.occasions.map((occasion) => (
             <li key={occasion.id}>{occasion.name}</li>
-          </ul>
-        ))}
+          ))}
+        </ul>
       </div>
     </div>
   );

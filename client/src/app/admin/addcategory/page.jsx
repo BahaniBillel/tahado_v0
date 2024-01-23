@@ -1,6 +1,6 @@
 import React from "react";
 import CategoryForm from "../../../components/categories/categoryForm";
-import { getClient } from "../../../app/lib/client";
+import { getClient } from "../../lib/client";
 import { GET_CATEGORIES } from "../../../graphql/querries";
 
 async function AddCategory() {

@@ -70,7 +70,10 @@ export const options: NextAuthOptions = {
         console.log("User Roles:", userRoles);
 
         return {
-          user_id: `${existingUser.user_id}`,
+          id: String(existingUser.user_id), // Assuming `user_id` can be mapped to `id`
+          email: existingUser.email, // Add this if your user object has an email field
+          name: `${existingUser.first_name} ${existingUser.last_name}`,
+          // user_id: `${existingUser.user_id}`,
           phone_number: existingUser.phone_number,
           first_name: existingUser.first_name,
           last_name: existingUser.last_name,
@@ -87,10 +90,13 @@ export const options: NextAuthOptions = {
         token.roles = user.roles || [];
         return {
           ...token,
+          id: String(user.id),
+          email: user.email, // Add this if your user object has an email field
+          name: user.name,
           phone_number: user.phone_number,
           first_name: user.first_name,
           last_name: user.last_name,
-          user_id: user.user_id,
+          // user_id: user.user_id,
           roles: user.roles,
         };
       }
@@ -102,9 +108,12 @@ export const options: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
+          id: token.id,
+          name: token.name,
+          email: token.email,
           phone_number: token.phone_number,
           first_name: token.first_name,
-          user_id: token.user_id,
+          // user_id: token.user_id,
           roles: token.roles,
         },
       };
