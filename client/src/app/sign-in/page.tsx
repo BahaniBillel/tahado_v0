@@ -8,7 +8,7 @@ function SignIn() {
   return (
     <div className="w-screen h-screen max-h-screen flex flex-row overflow-hidden">
       <div className="w-3/4 h-full">
-        <Image src={SignInIMage} alt={"/"} objectFit="cover" />
+        <Image src={SignInIMage} alt={"/"} style="cover" />
       </div>
       <SignInForm />
     </div>

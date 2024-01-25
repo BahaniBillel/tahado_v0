@@ -31,8 +31,6 @@ function Navigation({ url }) {
   const items = useSelector(selectItems);
   const likes = useSelector(selectLikes);
 
-  console.log("likes from navigatioon :", likes);
-
   const [isItems, setIsItems] = useState();
   const [isLikes, setLikes] = useState();
 
@@ -52,13 +50,10 @@ function Navigation({ url }) {
   // Get the user's session.
   const { data, status } = useSession();
 
-  console.log("This data from naigation bar", data?.user);
-
   const firstName = data?.user?.first_name;
   const lastName = data?.user?.last_name;
   const userID = parseInt(data?.user?.id);
 
-  console.log("last_name form navigation", firstName);
   return (
     <div className="text-right bg-white relative ">
       <div

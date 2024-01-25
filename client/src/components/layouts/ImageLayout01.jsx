@@ -128,13 +128,7 @@ function ImageLayout01({ image, alt, price, currency }) {
   return (
     <div className=" h-full flex flex-col items-center justify-center text-center bg-turquoise">
       <div className="w-full h-full relative group">
-        <Image
-          src={image}
-          alt={alt}
-          className="rounded-md  "
-          objectFit="fill"
-          layout="fill"
-        />
+        <Image src={image} alt={alt} className="rounded-md  " style="fill" />
 
         {price ? (
           <div

@@ -101,10 +101,10 @@ const ProductsLine = ({
       >
         <div>
           <div className="">
-            <div class="inline-flex items-center justify-center w-full">
-              <hr class="w-full h-px  my-8 bg-charcoal/20 border-0 dark:bg-gray-700" />
+            <div className="inline-flex items-center justify-center w-full">
+              <hr className="w-full h-px  my-8 bg-charcoal/20 border-0 dark:bg-gray-700" />
               <span
-                class="absolute px-3  text-charcoal text-2xl -translate-x-1/2
+                className="absolute px-3  text-charcoal text-2xl -translate-x-1/2
                bg-white left-1/2 dark:text-charcoal dark:bg-gray-900 whitespace-pre"
               >
                 {occasionLabel}
