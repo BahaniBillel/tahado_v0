@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
-// import { Bars3BottomRightIcon } from "@heroicons/react/24/solid";
+
 import {
   RiSearchEyeLine,
   RiHeart2Fill,
@@ -23,7 +22,7 @@ import { getSession, useSession } from "next-auth/react";
 
 import WishlistLength from "../WishlistLength";
 import BasketLength from "../BasketLength";
-import { useParams, useSearchParams } from "next/navigation";
+
 import SearchComp from "../SearchComp";
 import UserInfo from "../user/userInfo";
 
@@ -42,10 +41,6 @@ function Navigation({ url }) {
     setLikes(likes);
   }, [likes]);
   // console.log("likes from navigation :", likes[0]?.product_id);
-
-  const pathname = useParams();
-  const searchParams = useSearchParams();
-  // console.log(pathname, searchParams);
 
   // Get the user's session.
   const { data, status } = useSession();

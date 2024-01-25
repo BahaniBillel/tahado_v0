@@ -20,7 +20,11 @@ export default function Thanks() {
       <div className="bg-white p-8 rounded-lg w-full sm:w-96 text-center">
         {/* Placeholder for an image */}
         <div className="mb-4 relative">
-          <Image src={ThankYouImage} style="cover" alt="thankyou image" />
+          <Image
+            src={ThankYouImage}
+            style={{ objectFit: "cover" }}
+            alt="thankyou image"
+          />
         </div>
 
         <h1 className="text-2xl font-bold mb-4">Thank You for Trusting us!</h1>

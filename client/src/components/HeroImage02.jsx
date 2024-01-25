@@ -12,20 +12,32 @@ function HeroImage02() {
         className="col-span-1 bg-tulipyellow h-full  -skew-x-6 hover:scale-110 hover:shadow-md 
       duration-150 ease-in-out transition-all "
       >
-        <Image src={HeroImage1} alt="hero image" style="fill" />
+        <Image
+          src={HeroImage1}
+          alt="hero image"
+          style={{ objectFit: "fill" }}
+        />
       </div>
 
       <div
         className="col-span-1 bg-magenta h-full -skew-x-6 hover:scale-110 hover:shadow-md 
       duration-150 ease-in-out transition-all "
       >
-        <Image src={HeroImage2} alt="hero image" style="fill" />
+        <Image
+          src={HeroImage2}
+          alt="hero image"
+          style={{ objectFit: "fill" }}
+        />
       </div>
       <div
         className="col-span-1 bg-lightGray h-full -skew-x-6 hover:scale-110 hover:shadow-md 
       duration-150 ease-in-out transition-all"
       >
-        <Image src={HeroImage3} alt="hero image" style="fill" />
+        <Image
+          src={HeroImage3}
+          alt="hero image"
+          style={{ objectFit: "fill" }}
+        />
       </div>
     </div>
   );

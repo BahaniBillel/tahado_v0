@@ -7,7 +7,7 @@ function RegisterPage() {
   return (
     <div className="w-screen h-screen max-h-screen flex flex-col md:flex-row overflow-hidden">
       <div className="w-3/4 h-full">
-        <Image src={SignOutIMAGE} alt={"/"} style="cover" />
+        <Image src={SignOutIMAGE} alt={"/"} style={{ objectFit: "cover" }} />
       </div>
       <RegisterForm />
     </div>
