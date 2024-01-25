@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useQuery } from "@apollo/client";
 import { useSearchParams } from "next/navigation";
 import { GET_SEARCH_PRODUCTS } from "../../graphql/querries";
@@ -33,10 +33,12 @@ function SearchPage() {
       {loading && <p>Loading...</p>}
       {error && <p>Error: {error.message}</p>}
       <div>
-        {data &&
-          data.products
-            .filter((product) => product.giftname === search)
-            .map((product) => <div key={product.id}>{product.giftname}</div>)}
+        <Suspense>
+          {data &&
+            data.products
+              .filter((product) => product.giftname === search)
+              .map((product) => <div key={product.id}>{product.giftname}</div>)}
+        </Suspense>
       </div>
     </div>
   );
