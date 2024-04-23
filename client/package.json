@@ -5,10 +5,11 @@
   "proxy": "http://localhost:3001",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "next start",
+    "build": "cross-env prisma generate && next build",
+    "start": " cross-env NODE_ENV=production node server.js",
     "lint": "next lint",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "debug": "next build --debug"
   },
   "dependencies": {
     "@apollo/client": "^3.8.7",
@@ -79,6 +80,7 @@
     "@prisma/client": "^5.8.1",
     "@types/node": "20.5.1",
     "@types/react": "18.2.20",
+    "cross-env": "^7.0.3",
     "prisma": "^5.8.1",
     "typescript": "5.2.2"
   }
